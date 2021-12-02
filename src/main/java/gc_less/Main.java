@@ -5,9 +5,7 @@ import static gc_less.Cleaner.locals;
 public class Main {
   public static void main(String[] args) {
     long stack, stack1;
-    try (Cleaner ignored = locals()
-            .add(stack = IntStack.init(2))
-            .add(stack1 = LongStack.init())) {
+    try (Cleaner ignored = locals().add(stack = IntStack.init(2)).add(stack1 = LongStack.init())) {
       stack = IntStack.push(stack, 1);
       stack = IntStack.push(stack, 2);
       stack = IntStack.push(stack, 3);

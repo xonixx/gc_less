@@ -56,7 +56,7 @@ public class IntStack {
     return getUnsafe().getInt(address);
   }
 
-  public static void setLength(long address, int length) {
+  private static void setLength(long address, int length) {
     getUnsafe().putInt(address, length);
   }
 
@@ -64,7 +64,7 @@ public class IntStack {
     return getUnsafe().getInt(address + capOffset);
   }
 
-  static void setCapacity(long address, int capacity) {
+  private static void setCapacity(long address, int capacity) {
     getUnsafe().putInt(address + capOffset, capacity);
   }
 }
