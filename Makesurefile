@@ -1,0 +1,12 @@
+
+
+@goal compiled @private
+  mvn compile
+
+@goal main3
+@depends_on compiled
+  java \
+    -Xlog:gc \
+    -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC \
+    -Xms5m -Xmx5m \
+    -cp target/classes gc_less.Main3
