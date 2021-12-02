@@ -1,9 +1,9 @@
-package pc_less;
+package gc_less;
 
-import gc_less.IntStack;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class IntStackTests {
   @Test
@@ -24,6 +24,21 @@ public class IntStackTests {
     assertEquals(1, IntStack.getLength(stack));
     assertEquals(111, IntStack.pop(stack));
     assertEquals(0, IntStack.getLength(stack));
+
+    IntStack.free(stack);
+  }
+
+  @Test
+  public void test2() {
+    long stack = IntStack.init(2);
+
+    for (int i = 0; i < 10; i++) {
+      stack = IntStack.push(stack, i);
+    }
+
+    assertEquals(10, IntStack.getLength(stack));
+    assertTrue(IntStack.getCapacity(stack) >= 10);
+    assertEquals(9, IntStack.peek(stack));
 
     IntStack.free(stack);
   }
