@@ -10,13 +10,18 @@ public class IntStackTests {
   public void test1() {
     long stack = IntStack.allocate(10);
 
+    long ref = IntStack.getRef(stack);
+    assertEquals(stack, Ref.get(ref));
+
     assertEquals(0, IntStack.getLength(stack));
 
     stack = IntStack.push(stack, 111);
+    assertEquals(stack, Ref.get(ref));
 
     assertEquals(1, IntStack.getLength(stack));
 
     stack = IntStack.push(stack, 222);
+    assertEquals(stack, Ref.get(ref));
 
     assertEquals(2, IntStack.getLength(stack));
     assertEquals(222, IntStack.peek(stack));
@@ -26,14 +31,19 @@ public class IntStackTests {
     assertEquals(0, IntStack.getLength(stack));
 
     IntStack.free(stack);
+    Ref.free(ref);
   }
 
   @Test
   public void test2() {
     long stack = IntStack.allocate(2);
 
+    long ref = IntStack.getRef(stack);
+    assertEquals(stack, Ref.get(ref));
+
     for (int i = 0; i < 10; i++) {
       stack = IntStack.push(stack, i);
+      assertEquals(stack, Ref.get(ref));
     }
 
     assertEquals(10, IntStack.getLength(stack));
@@ -41,5 +51,6 @@ public class IntStackTests {
     assertEquals(9, IntStack.peek(stack));
 
     IntStack.free(stack);
+    Ref.free(ref);
   }
 }
