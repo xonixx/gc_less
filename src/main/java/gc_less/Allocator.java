@@ -15,13 +15,13 @@ public class Allocator implements AutoCloseable {
     return instance;
   }
 
-  public static long newIntStack(int initialCapacity) {
+  public long newIntStack(int initialCapacity) {
     long stack = IntStack.allocate(initialCapacity);
     registerForCleanup(IntStack.getRef(stack));
     return stack;
   }
 
-  public static long newLongStack(int initialCapacity) {
+  public long newLongStack(int initialCapacity) {
     return LongStack.allocate(initialCapacity);
   }
 
@@ -38,13 +38,13 @@ public class Allocator implements AutoCloseable {
       long ref = LongStack.pop(locals);
       long addr = Ref.get(ref);
 
-      System.out.println("Freeing local addr" + addr + "...");
+      System.out.println("Freeing local addr " + addr + "...");
       getUnsafe().freeMemory(addr);
 
-      System.out.println("Freeing local ref " + ref + "...");
+      System.out.println("Freeing local ref  " + ref + "...");
       Ref.free(ref);
     }
-    System.out.println("Freeing locals " + locals + "...");
+    System.out.println("Freeing locals     " + locals + "...");
     getUnsafe().freeMemory(locals);
   }
 }

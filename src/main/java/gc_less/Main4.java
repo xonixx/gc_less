@@ -1,7 +1,5 @@
 package gc_less;
 
-import static gc_less.Cleaner.locals;
-
 public class Main4 {
   public static void main(String[] args) throws InterruptedException {
     while (true) {
@@ -11,12 +9,17 @@ public class Main4 {
   }
 
   private static void doIt() {
-    long stack;
-//    int N = 1000_000_000;
+    //    int N = 1000_000_000;
     int N = 500_000_000;
-    try (Cleaner ignored = locals().add(stack = IntStack.allocate(N + 1))) {
+    //    int N = 100_000_000;
+    try (Allocator allocator = Allocator.newFrame()) {
+      long stack = allocator.newIntStack(10);
       for (int i = 0; i < N; i++) {
+        long oldStack = stack;
         stack = IntStack.push(stack, i);
+        if (oldStack != stack) {
+          System.out.println("Reallocation occurred.");
+        }
       }
       long sum = 0;
       while (IntStack.getLength(stack) > 0) {
