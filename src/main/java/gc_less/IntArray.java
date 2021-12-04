@@ -4,7 +4,6 @@ import static gc_less.TypeSizes.INT_SIZE;
 import static gc_less.Unsafer.getUnsafe;
 
 /** Non-resizable array (similar to arrays in Java) */
-// TODO arraycopy
 public class IntArray {
   private static final long lengthOffset = 0;
   private static final long dataOffset = lengthOffset + INT_SIZE;
@@ -41,5 +40,13 @@ public class IntArray {
 
   public static void free(long address) {
     getUnsafe().freeMemory(address);
+  }
+
+  public static void arraycopy(long src, long srcPos, long dest, long destPos, int length) {
+    getUnsafe()
+        .copyMemory(
+            src + dataOffset + srcPos * INT_SIZE,
+            dest + dataOffset + destPos * INT_SIZE,
+            length * INT_SIZE);
   }
 }
