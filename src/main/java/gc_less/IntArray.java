@@ -16,17 +16,17 @@ public class IntArray {
     return addr;
   }
 
-  public static void set(long address, long index, int value) {
+  public static void set(long address, int index, int value) {
     checkBoundaries(address, index);
     getUnsafe().putInt(address + dataOffset + index * INT_SIZE, value);
   }
 
-  public static int get(long address, long index) {
+  public static int get(long address, int index) {
     checkBoundaries(address, index);
     return getUnsafe().getInt(address + dataOffset + index * INT_SIZE);
   }
 
-  private static void checkBoundaries(long address, long index) {
+  private static void checkBoundaries(long address, int index) {
     if (index < 0 || index >= getLength(address)) throw new IndexOutOfBoundsException();
   }
 
@@ -42,7 +42,7 @@ public class IntArray {
     getUnsafe().freeMemory(address);
   }
 
-  public static void arraycopy(long src, long srcPos, long dest, long destPos, int length) {
+  public static void arraycopy(long src, int srcPos, long dest, int destPos, int length) {
     getUnsafe()
         .copyMemory(
             src + dataOffset + srcPos * INT_SIZE,
