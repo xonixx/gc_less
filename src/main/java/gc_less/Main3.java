@@ -16,7 +16,11 @@ public class Main3 {
     int N = 500_000_000;
     try (Cleaner ignored = locals().add(stack = IntStack.allocate(N + 1))) {
       for (int i = 0; i < N; i++) {
+        long oldStack = stack;
         stack = IntStack.push(stack, i);
+        if (oldStack != stack) {
+          System.out.println("[!!!] Reallocation occurred.");
+        }
       }
       long sum = 0;
       while (IntStack.getLength(stack) > 0) {
