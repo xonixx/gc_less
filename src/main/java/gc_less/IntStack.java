@@ -1,10 +1,10 @@
 package gc_less;
 
+import static gc_less.TypeSizes.INT_SIZE;
 import static gc_less.Unsafer.getUnsafe;
 
 public class IntStack {
   public static final int INITIAL_CAP = 10;
-  public static final long INT_SIZE = 4;
 
   private static final long lengthOffset = 0;
   private static final long capOffset = lengthOffset + INT_SIZE;
