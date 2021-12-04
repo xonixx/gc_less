@@ -2,7 +2,7 @@ package gc_less;
 
 import static gc_less.Cleaner.locals;
 
-public class Main3 {
+public class Main4 {
   public static void main(String[] args) throws InterruptedException {
     while (true) {
       doIt();

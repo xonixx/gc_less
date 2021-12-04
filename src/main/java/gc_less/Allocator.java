@@ -16,17 +16,18 @@ public class Allocator implements AutoCloseable {
   }
 
   public static long newIntStack(int initialCapacity) {
-    return IntStack.allocate(initialCapacity);
+    long stack = IntStack.allocate(initialCapacity);
+    registerForCleanup(IntStack.getRef(stack));
+    return stack;
   }
 
   public static long newLongStack(int initialCapacity) {
     return LongStack.allocate(initialCapacity);
   }
 
-  private Allocator add(long ref) {
+  private static void registerForCleanup(long ref) {
     long locals = LongStack.peek(stack);
     LongStack.push(locals, ref);
-    return this;
   }
 
   @Override
@@ -34,9 +35,14 @@ public class Allocator implements AutoCloseable {
     System.out.println("Freeing...");
     long locals = LongStack.pop(stack);
     while (LongStack.getLength(locals) > 0) {
-      long addr = LongStack.pop(locals);
-      System.out.println("Freeing local " + addr + "...");
+      long ref = LongStack.pop(locals);
+      long addr = Ref.get(ref);
+
+      System.out.println("Freeing local addr" + addr + "...");
       getUnsafe().freeMemory(addr);
+
+      System.out.println("Freeing local ref " + ref + "...");
+      Ref.free(ref);
     }
     System.out.println("Freeing locals " + locals + "...");
     getUnsafe().freeMemory(locals);
