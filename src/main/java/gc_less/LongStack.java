@@ -8,7 +8,8 @@ public class LongStack {
   public static final int INITIAL_CAP = 10;
 
   private static final long lengthOffset = 0;
-  private static final long capOffset = lengthOffset + INT_SIZE;
+  private static final long refOffset = lengthOffset + INT_SIZE;
+  private static final long capOffset = refOffset + LONG_SIZE;
   private static final long dataOffset = capOffset + INT_SIZE;
 
   public static long allocate() {
@@ -19,6 +20,7 @@ public class LongStack {
     long addr = getUnsafe().allocateMemory(dataOffset + initialCapacity * LONG_SIZE);
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
+    setRef(addr, Ref.create(addr));
     return addr;
   }
 
@@ -34,7 +36,9 @@ public class LongStack {
     int capacity = getCapacity(addr);
     if (capacity == len) {
       setCapacity(addr, capacity = 2 * capacity);
-      return getUnsafe().reallocateMemory(addr, dataOffset + capacity * LONG_SIZE);
+      long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * LONG_SIZE);
+      Ref.set(getRef(newAddr), newAddr);
+      return newAddr;
     }
     return addr;
   }
@@ -67,5 +71,13 @@ public class LongStack {
 
   private static void setCapacity(long address, int capacity) {
     getUnsafe().putInt(address + capOffset, capacity);
+  }
+
+  public static long getRef(long address) {
+    return getUnsafe().getLong(address + refOffset);
+  }
+
+  private static void setRef(long address, long ref) {
+    getUnsafe().putLong(address + refOffset, ref);
   }
 }

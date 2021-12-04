@@ -10,13 +10,18 @@ public class LongStackTests {
   public void test1() {
     long stack = LongStack.allocate(10);
 
+    long ref = LongStack.getRef(stack);
+    assertEquals(stack, Ref.get(ref));
+    
     assertEquals(0, LongStack.getLength(stack));
 
     stack = LongStack.push(stack, 111);
+    assertEquals(stack, Ref.get(ref));
 
     assertEquals(1, LongStack.getLength(stack));
 
     stack = LongStack.push(stack, 222);
+    assertEquals(stack, Ref.get(ref));
 
     assertEquals(2, LongStack.getLength(stack));
     assertEquals(222, LongStack.peek(stack));
@@ -26,14 +31,19 @@ public class LongStackTests {
     assertEquals(0, LongStack.getLength(stack));
 
     LongStack.free(stack);
+    Ref.free(ref);
   }
 
   @Test
   public void test2() {
     long stack = LongStack.allocate(2);
 
+    long ref = LongStack.getRef(stack);
+    assertEquals(stack, Ref.get(ref));
+
     for (int i = 0; i < 10; i++) {
       stack = LongStack.push(stack, i);
+      assertEquals(stack, Ref.get(ref));
     }
 
     assertEquals(10, LongStack.getLength(stack));
@@ -41,5 +51,6 @@ public class LongStackTests {
     assertEquals(9, LongStack.peek(stack));
 
     LongStack.free(stack);
+    Ref.free(ref);
   }
 }
