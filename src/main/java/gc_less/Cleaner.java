@@ -4,13 +4,13 @@ import static gc_less.Unsafer.getUnsafe;
 
 public class Cleaner implements AutoCloseable {
 
-  public static final Cleaner instance = new Cleaner();
-  private static final long stack = LongStack.init();
+  private static final Cleaner instance = new Cleaner();
+  private static final long stack = LongStack.allocate();
 
   private Cleaner() {}
 
   public static Cleaner locals() {
-    long locals = LongStack.init();
+    long locals = LongStack.allocate();
     LongStack.push(stack, locals);
     return instance;
   }

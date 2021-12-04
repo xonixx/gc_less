@@ -12,7 +12,7 @@ public class Main3 {
 
   private static void doIt() {
     long stack;
-    try (Cleaner ignored = locals().add(stack = IntStack.init(1000_000_001))) {
+    try (Cleaner ignored = locals().add(stack = IntStack.allocate(1000_000_001))) {
       for (int i = 0; i < 1000_000_000; i++) {
         stack = IntStack.push(stack, i);
       }

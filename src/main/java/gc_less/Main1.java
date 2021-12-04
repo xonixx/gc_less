@@ -2,7 +2,7 @@ package gc_less;
 
 public class Main1 {
   public static void main(String[] args) throws Exception {
-    long stack = LongStack.init(2);
+    long stack = LongStack.allocate(2);
     stack = LongStack.push(stack, 1);
     stack = LongStack.push(stack, 2);
     stack = LongStack.push(stack, 3);

@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class LongStackTests {
   @Test
   public void test1() {
-    long stack = LongStack.init(10);
+    long stack = LongStack.allocate(10);
 
     assertEquals(0, LongStack.getLength(stack));
 
@@ -30,7 +30,7 @@ public class LongStackTests {
 
   @Test
   public void test2() {
-    long stack = LongStack.init(2);
+    long stack = LongStack.allocate(2);
 
     for (int i = 0; i < 10; i++) {
       stack = LongStack.push(stack, i);

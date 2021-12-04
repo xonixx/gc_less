@@ -1,23 +1,26 @@
 package gc_less;
 
 import static gc_less.TypeSizes.INT_SIZE;
+import static gc_less.TypeSizes.LONG_SIZE;
 import static gc_less.Unsafer.getUnsafe;
 
 public class IntStack {
   public static final int INITIAL_CAP = 10;
 
   private static final long lengthOffset = 0;
-  private static final long capOffset = lengthOffset + INT_SIZE;
+  private static final long refOffset = lengthOffset + INT_SIZE;
+  private static final long capOffset = refOffset + LONG_SIZE;
   private static final long dataOffset = capOffset + INT_SIZE;
 
-  public static long init() {
-    return init(INITIAL_CAP);
+  public static long allocate() {
+    return allocate(INITIAL_CAP);
   }
 
-  public static long init(int initialCapacity) {
+  public static long allocate(int initialCapacity) {
     long addr = getUnsafe().allocateMemory(dataOffset + initialCapacity * INT_SIZE);
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
+    setRef(addr, Ref.create(addr));
     return addr;
   }
 
@@ -33,7 +36,9 @@ public class IntStack {
     int capacity = getCapacity(addr);
     if (capacity == len) {
       setCapacity(addr, capacity = 2 * capacity);
-      return getUnsafe().reallocateMemory(addr, dataOffset + capacity * INT_SIZE);
+      long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * INT_SIZE);
+      Ref.set(getRef(newAddr), newAddr);
+      return newAddr;
     }
     return addr;
   }
@@ -66,5 +71,13 @@ public class IntStack {
 
   private static void setCapacity(long address, int capacity) {
     getUnsafe().putInt(address + capOffset, capacity);
+  }
+
+  public static long getRef(long address) {
+    return getUnsafe().getLong(address + refOffset);
+  }
+
+  private static void setRef(long address, long ref) {
+    getUnsafe().putLong(address + refOffset, ref);
   }
 }

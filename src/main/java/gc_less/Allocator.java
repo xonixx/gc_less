@@ -4,20 +4,28 @@ import static gc_less.Unsafer.getUnsafe;
 
 public class Allocator implements AutoCloseable {
 
-  public static final Allocator instance = new Allocator();
-  private static final long stack = LongStack.init();
+  private static final Allocator instance = new Allocator();
+  private static final long stack = LongStack.allocate();
 
   private Allocator() {}
 
-  public static Allocator locals() {
-    long locals = LongStack.init();
+  public static Allocator newFrame() {
+    long locals = LongStack.allocate();
     LongStack.push(stack, locals);
     return instance;
   }
 
-  public Allocator add(long address) {
+  public static long newIntStack(int initialCapacity) {
+    return IntStack.allocate(initialCapacity);
+  }
+
+  public static long newLongStack(int initialCapacity) {
+    return LongStack.allocate(initialCapacity);
+  }
+
+  private Allocator add(long ref) {
     long locals = LongStack.peek(stack);
-    LongStack.push(locals, address);
+    LongStack.push(locals, ref);
     return this;
   }
 

@@ -11,11 +11,11 @@ public class LongStack {
   private static final long capOffset = lengthOffset + INT_SIZE;
   private static final long dataOffset = capOffset + INT_SIZE;
 
-  public static long init() {
-    return init(INITIAL_CAP);
+  public static long allocate() {
+    return allocate(INITIAL_CAP);
   }
 
-  public static long init(int initialCapacity) {
+  public static long allocate(int initialCapacity) {
     long addr = getUnsafe().allocateMemory(dataOffset + initialCapacity * LONG_SIZE);
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
