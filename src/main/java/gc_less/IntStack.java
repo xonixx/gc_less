@@ -49,7 +49,7 @@ public class IntStack {
     return getUnsafe().getInt(addr + dataOffset + len * INT_SIZE);
   }
 
-  public static long peek(long addr) {
+  public static int peek(long addr) {
     return getUnsafe().getInt(addr + dataOffset + (getLength(addr) - 1) * INT_SIZE);
   }
 

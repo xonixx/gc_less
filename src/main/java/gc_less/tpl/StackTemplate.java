@@ -3,15 +3,15 @@ package gc_less.tpl;
 import gc_less.Ref;
 
 import static gc_less.TypeSizes.INT_SIZE;
-import static gc_less.TypeSizes.LONG_SIZE;
 import static gc_less.Unsafer.getUnsafe;
 
-public class LongStack {
+@Template(generate = {int.class, long.class})
+public class StackTemplate {
   public static final int INITIAL_CAP = 10;
 
   private static final long lengthOffset = 0;
   private static final long refOffset = lengthOffset + INT_SIZE;
-  private static final long capOffset = refOffset + LONG_SIZE;
+  private static final long capOffset = refOffset + Tpl.typeSize();
   private static final long dataOffset = capOffset + INT_SIZE;
 
   public static long allocate() {
@@ -19,17 +19,17 @@ public class LongStack {
   }
 
   public static long allocate(int initialCapacity) {
-    long addr = getUnsafe().allocateMemory(dataOffset + initialCapacity * LONG_SIZE);
+    long addr = getUnsafe().allocateMemory(dataOffset + initialCapacity * Tpl.typeSize());
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
     setRef(addr, Ref.create(addr));
     return addr;
   }
 
-  public static long push(long addr, long value) {
+  public static long push(long addr, @Type long value) {
     int len = getLength(addr);
     addr = ensureCapacity(addr, len);
-    getUnsafe().putLong(addr + dataOffset + len * LONG_SIZE, value);
+    Tpl.put(addr + dataOffset + len * Tpl.typeSize(), value);
     setLength(addr, ++len);
     return addr;
   }
@@ -38,21 +38,21 @@ public class LongStack {
     int capacity = getCapacity(addr);
     if (capacity == len) {
       setCapacity(addr, capacity = 2 * capacity);
-      long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * LONG_SIZE);
+      long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * Tpl.typeSize());
       Ref.set(getRef(newAddr), newAddr);
       return newAddr;
     }
     return addr;
   }
 
-  public static long pop(long addr) {
+  public static @Type long pop(long addr) {
     int len = getLength(addr);
     setLength(addr, --len);
-    return getUnsafe().getLong(addr + dataOffset + len * LONG_SIZE);
+    return Tpl.get(addr + dataOffset + len * Tpl.typeSize());
   }
 
-  public static long peek(long addr) {
-    return getUnsafe().getLong(addr + dataOffset + (getLength(addr) - 1) * LONG_SIZE);
+  public static @Type long peek(long addr) {
+    return Tpl.get(addr + dataOffset + (getLength(addr) - 1) * Tpl.typeSize());
   }
 
   public static void free(long address) {
