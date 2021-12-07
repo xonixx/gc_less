@@ -32,6 +32,11 @@ function processTemplate(tplFolder, tplFileName,   tplFile,type,outFile,line,lcf
         line = line "\nimport static gc_less.TypeSizes.DOUBLE_SIZE;"
       }
       gsub(/\@Type long/, type, line)
+      if (line ~ /\@Type/) {
+        print "Error at file: " tplFile ", line:"
+        print line
+        exit 1
+      }
       gsub(/Tpl\.typeSize\(\)/, toupper(type) "_SIZE", line)
       gsub(/Tpl\.put\(/, "getUnsafe().put" lcfType "(", line)
       gsub(/Tpl\.get\(/, "getUnsafe().get" lcfType "(", line)
