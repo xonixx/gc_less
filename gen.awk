@@ -21,7 +21,16 @@ function processTemplate(tplFolder, tplFileName,   tplFile,type,outFile,line,lcf
 
     print tplFile " -> " outFile "..."
 
+    printf "" > outFile
+
     while (getline line < tplFile) {
+      if (line ~ /^public class/)
+        sub(/Template/, lcfType, line)
+      else if(line ~ /^package/)
+        line = "package gc_less;"
+      else if (line ~ /import static gc_less\.TypeSizes\.LONG_SIZE;/) {
+        line = line "\nimport static gc_less.TypeSizes.DOUBLE_SIZE;"
+      }
       gsub(/\@Type long/, type, line)
       gsub(/Tpl\.typeSize\(\)/, toupper(type) "_SIZE", line)
       gsub(/Tpl\.put\(/, "getUnsafe().put" lcfType "(", line)

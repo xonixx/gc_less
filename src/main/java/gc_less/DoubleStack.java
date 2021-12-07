@@ -7,7 +7,7 @@ import static gc_less.TypeSizes.LONG_SIZE;
 import static gc_less.TypeSizes.DOUBLE_SIZE;
 import static gc_less.Unsafer.getUnsafe;
 
-public class IntStack {
+public class DoubleStack {
   public static final int INITIAL_CAP = 10;
 
   private static final long lengthOffset = 0;
@@ -20,17 +20,17 @@ public class IntStack {
   }
 
   public static long allocate(int initialCapacity) {
-    long addr = getUnsafe().allocateMemory(dataOffset + initialCapacity * INT_SIZE);
+    long addr = getUnsafe().allocateMemory(dataOffset + initialCapacity * DOUBLE_SIZE);
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
     setRef(addr, Ref.create(addr));
     return addr;
   }
 
-  public static long push(long addr, int value) {
+  public static long push(long addr, double value) {
     int len = getLength(addr);
     addr = ensureCapacity(addr, len);
-    getUnsafe().putInt(addr + dataOffset + len * INT_SIZE, value);
+    getUnsafe().putDouble(addr + dataOffset + len * DOUBLE_SIZE, value);
     setLength(addr, ++len);
     return addr;
   }
@@ -39,21 +39,21 @@ public class IntStack {
     int capacity = getCapacity(addr);
     if (capacity == len) {
       setCapacity(addr, capacity = 2 * capacity);
-      long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * INT_SIZE);
+      long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * DOUBLE_SIZE);
       Ref.set(getRef(newAddr), newAddr);
       return newAddr;
     }
     return addr;
   }
 
-  public static int pop(long addr) {
+  public static double pop(long addr) {
     int len = getLength(addr);
     setLength(addr, --len);
-    return getUnsafe().getInt(addr + dataOffset + len * INT_SIZE);
+    return getUnsafe().getDouble(addr + dataOffset + len * DOUBLE_SIZE);
   }
 
-  public static int peek(long addr) {
-    return getUnsafe().getInt(addr + dataOffset + (getLength(addr) - 1) * INT_SIZE);
+  public static double peek(long addr) {
+    return getUnsafe().getDouble(addr + dataOffset + (getLength(addr) - 1) * DOUBLE_SIZE);
   }
 
   public static void free(long address) {
