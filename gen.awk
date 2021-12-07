@@ -13,12 +13,26 @@ function gen(   cmd,f){
   }
   close(cmd)
 }
-function processTemplate(tplFolder, tplFileName,   tplFile,type,outFile){
+function processTemplate(tplFolder, tplFileName,   tplFile,type,outFile,line,lcfType){
   tplFile = tplFolder "/" tplFileName
   for (type in GEN) {
     outFile = OUT_FOLDER "/" tplFileName
-    sub(/Template/,lcFirst(type),outFile)
-    print tplFile " -> " outFile
+    sub(/Template/,lcfType=lcFirst(type),outFile)
+
+    print tplFile " -> " outFile "..."
+
+    while (getline line < tplFile) {
+      gsub(/\@Type long/, type, line)
+      gsub(/Tpl\.typeSize\(\)/, toupper(type) "_SIZE", line)
+      gsub(/Tpl\.put\(/, "getUnsafe().put" lcfType "(", line)
+      gsub(/Tpl\.get\(/, "getUnsafe().get" lcfType "(", line)
+      print line >> outFile
+    }
+
+    print "DONE."
+
+    close(tplFile)
+    close(outFile)
   }
 }
 function lcFirst(s) { return toupper(substr(s,1,1)) substr(s,2) }
