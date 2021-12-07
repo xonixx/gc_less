@@ -1,10 +1,7 @@
 package gc_less;
 
-import gc_less.Ref;
 
-import static gc_less.TypeSizes.INT_SIZE;
-import static gc_less.TypeSizes.LONG_SIZE;
-import static gc_less.TypeSizes.DOUBLE_SIZE;
+import static gc_less.TypeSizes.*;
 import static gc_less.Unsafer.getUnsafe;
 
 public class LongStack {

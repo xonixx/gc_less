@@ -13,7 +13,7 @@ function gen(   cmd,f){
   }
   close(cmd)
 }
-function processTemplate(tplFolder, tplFileName,   tplFile,type,outFile,line,lcfType){
+function processTemplate(tplFolder, tplFileName,   tplFile,type,outFile,line,lcfType,typeSizesDone){
   tplFile = tplFolder "/" tplFileName
   for (type in GEN) {
     outFile = OUT_FOLDER "/" tplFileName
@@ -23,23 +23,30 @@ function processTemplate(tplFolder, tplFileName,   tplFile,type,outFile,line,lcf
 
     printf "" > outFile
 
+    typeSizesDone=0
     while (getline line < tplFile) {
       if (line ~ /^public class/)
         sub(/Template/, lcfType, line)
       else if(line ~ /^package/)
         line = "package gc_less;"
-      else if (line ~ /import static gc_less\.TypeSizes\.LONG_SIZE;/) {
-        line = line "\nimport static gc_less.TypeSizes.DOUBLE_SIZE;"
+      else if (line ~ /import static gc_less\.TypeSizes\./)
+        if (!typeSizesDone++)
+          line = "import static gc_less.TypeSizes.*;"
+        else
+          continue
+      else if (line ~ /import gc_less\./)
+        continue
+      else {
+        gsub(/\@Type long/, type, line)
+        if (line ~ /\@Type/) {
+          print "Error at file: " tplFile ", line:"
+          print line
+          exit 1
+        }
+        gsub(/Tpl\.typeSize\(\)/, toupper(type) "_SIZE", line)
+        gsub(/Tpl\.put\(/, "getUnsafe().put" lcfType "(", line)
+        gsub(/Tpl\.get\(/, "getUnsafe().get" lcfType "(", line)
       }
-      gsub(/\@Type long/, type, line)
-      if (line ~ /\@Type/) {
-        print "Error at file: " tplFile ", line:"
-        print line
-        exit 1
-      }
-      gsub(/Tpl\.typeSize\(\)/, toupper(type) "_SIZE", line)
-      gsub(/Tpl\.put\(/, "getUnsafe().put" lcfType "(", line)
-      gsub(/Tpl\.get\(/, "getUnsafe().get" lcfType "(", line)
       print line >> outFile
     }
 

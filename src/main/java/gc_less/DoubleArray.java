@@ -4,7 +4,7 @@ import static gc_less.TypeSizes.*;
 import static gc_less.Unsafer.getUnsafe;
 
 /** Non-resizable array (similar to arrays in Java) */
-public class IntArray {
+public class DoubleArray {
   private static final long lengthOffset = 0;
   private static final long dataOffset = lengthOffset + INT_SIZE;
 
@@ -16,14 +16,14 @@ public class IntArray {
     return addr;
   }
 
-  public static void set(long address, int index, int value) {
+  public static void set(long address, int index, double value) {
     checkBoundaries(address, index);
-    getUnsafe().putInt(address + dataOffset + index * INT_SIZE, value);
+    getUnsafe().putDouble(address + dataOffset + index * DOUBLE_SIZE, value);
   }
 
-  public static int get(long address, int index) {
+  public static double get(long address, int index) {
     checkBoundaries(address, index);
-    return getUnsafe().getInt(address + dataOffset + index * INT_SIZE);
+    return getUnsafe().getDouble(address + dataOffset + index * DOUBLE_SIZE);
   }
 
   private static void checkBoundaries(long address, int index) {
@@ -45,8 +45,8 @@ public class IntArray {
   public static void arraycopy(long src, int srcPos, long dest, int destPos, int length) {
     getUnsafe()
         .copyMemory(
-            src + dataOffset + srcPos * INT_SIZE,
-            dest + dataOffset + destPos * INT_SIZE,
-            length * INT_SIZE);
+            src + dataOffset + srcPos * DOUBLE_SIZE,
+            dest + dataOffset + destPos * DOUBLE_SIZE,
+            length * DOUBLE_SIZE);
   }
 }
