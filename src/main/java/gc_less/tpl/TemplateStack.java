@@ -3,15 +3,15 @@ package gc_less.tpl;
 import gc_less.Ref;
 
 import static gc_less.TypeSizes.INT_SIZE;
+import static gc_less.TypeSizes.LONG_SIZE;
 import static gc_less.Unsafer.getUnsafe;
 
-@Template(generate = {int.class, long.class})
-public class StackTemplate {
+public class TemplateStack {
   public static final int INITIAL_CAP = 10;
 
   private static final long lengthOffset = 0;
   private static final long refOffset = lengthOffset + INT_SIZE;
-  private static final long capOffset = refOffset + Tpl.typeSize();
+  private static final long capOffset = refOffset + LONG_SIZE;
   private static final long dataOffset = capOffset + INT_SIZE;
 
   public static long allocate() {
