@@ -9,7 +9,7 @@ public class DoubleArray {
   private static final long dataOffset = lengthOffset + INT_SIZE;
 
   public static long allocate(int length) {
-    long bytes = dataOffset + length * INT_SIZE;
+    long bytes = dataOffset + length * DOUBLE_SIZE;
     long addr = getUnsafe().allocateMemory(bytes);
     getUnsafe().setMemory(addr, bytes, (byte) 0);
     setLength(addr, length);
