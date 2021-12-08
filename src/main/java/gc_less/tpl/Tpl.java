@@ -1,15 +1,18 @@
 package gc_less.tpl;
 
+import gc_less.TypeSizes;
+import gc_less.Unsafer;
+
 public final class Tpl {
   public static long typeSize() {
-    throw new UnsupportedOperationException();
+    return TypeSizes.LONG_SIZE;
   }
 
   public static void put(long address, long value) {
-    throw new UnsupportedOperationException();
+    Unsafer.getUnsafe().putLong(address, value);
   }
 
   public static long get(long address) {
-    throw new UnsupportedOperationException();
+    return Unsafer.getUnsafe().getLong(address);
   }
 }
