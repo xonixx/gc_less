@@ -22,7 +22,9 @@ public class Allocator implements AutoCloseable {
   }
 
   public long newLongStack(int initialCapacity) {
-    return LongStack.allocate(initialCapacity);
+    long stack = LongStack.allocate(initialCapacity);
+    registerForCleanup(LongStack.getRef(stack));
+    return stack;
   }
 
   private static void registerForCleanup(long ref) {

@@ -1,18 +1,49 @@
 package gc_less.tpl;
 
+import gc_less.Ref;
+
 import static gc_less.TypeSizes.INT_SIZE;
+import static gc_less.TypeSizes.LONG_SIZE;
 import static gc_less.Unsafer.getUnsafe;
 
 /** Resizable array (similar to ArrayList in Java) */
 public class TemplateArrayList {
   private static final long lengthOffset = 0;
-  private static final long dataOffset = lengthOffset + INT_SIZE;
+  private static final long refOffset = lengthOffset + INT_SIZE;
+  private static final long capOffset = refOffset + LONG_SIZE;
+  private static final long dataOffset = capOffset + INT_SIZE;
 
-  public static long allocate(int length) {
-    long bytes = dataOffset + length * Tpl.typeSize();
+  public static long allocate(int initialCapacity) {
+    long bytes = dataOffset + initialCapacity * Tpl.typeSize();
     long addr = getUnsafe().allocateMemory(bytes);
     getUnsafe().setMemory(addr, bytes, (byte) 0);
-    setLength(addr, length);
+    setLength(addr, 0);
+    setCapacity(addr, initialCapacity);
+    setRef(addr, Ref.create(addr));
+    return addr;
+  }
+
+  public static void free(long address) {
+    getUnsafe().freeMemory(address);
+  }
+
+  public static long add(long addr, @Type long value) {
+    int len = getLength(addr);
+    addr = ensureCapacity(addr, len);
+    Tpl.put(addr + dataOffset + len * Tpl.typeSize(), value);
+    setLength(addr, ++len);
+    return addr;
+  }
+
+  private static long ensureCapacity(long addr, int len) {
+    int capacity = getCapacity(addr);
+    if (capacity == len) {
+      setCapacity(addr, capacity = 2 * capacity);
+      long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * Tpl.typeSize());
+      // TODO zero new memory
+      Ref.set(getRef(newAddr), newAddr);
+      return newAddr;
+    }
     return addr;
   }
 
@@ -38,15 +69,27 @@ public class TemplateArrayList {
     getUnsafe().putInt(address, length);
   }
 
-  public static void free(long address) {
-    getUnsafe().freeMemory(address);
+  public static int getCapacity(long address) {
+    return getUnsafe().getInt(address + capOffset);
   }
 
-  public static void arraycopy(long src, int srcPos, long dest, int destPos, int length) {
+  private static void setCapacity(long address, int capacity) {
+    getUnsafe().putInt(address + capOffset, capacity);
+  }
+
+  public static long getRef(long address) {
+    return getUnsafe().getLong(address + refOffset);
+  }
+
+  private static void setRef(long address, long ref) {
+    getUnsafe().putLong(address + refOffset, ref);
+  }
+
+/*  public static void arraycopy(long src, int srcPos, long dest, int destPos, int length) {
     getUnsafe()
         .copyMemory(
             src + dataOffset + srcPos * Tpl.typeSize(),
             dest + dataOffset + destPos * Tpl.typeSize(),
             length * Tpl.typeSize());
-  }
+  }*/
 }
