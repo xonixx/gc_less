@@ -16,7 +16,6 @@ public class TemplateArrayList {
   public static long allocate(int initialCapacity) {
     long bytes = dataOffset + initialCapacity * Tpl.typeSize();
     long addr = getUnsafe().allocateMemory(bytes);
-    getUnsafe().setMemory(addr, bytes, (byte) 0);
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
     setRef(addr, Ref.create(addr));
@@ -40,7 +39,6 @@ public class TemplateArrayList {
     if (capacity == len) {
       setCapacity(addr, capacity = 2 * capacity);
       long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * Tpl.typeSize());
-      // TODO zero new memory
       Ref.set(getRef(newAddr), newAddr);
       return newAddr;
     }
@@ -84,12 +82,4 @@ public class TemplateArrayList {
   private static void setRef(long address, long ref) {
     getUnsafe().putLong(address + refOffset, ref);
   }
-
-/*  public static void arraycopy(long src, int srcPos, long dest, int destPos, int length) {
-    getUnsafe()
-        .copyMemory(
-            src + dataOffset + srcPos * Tpl.typeSize(),
-            dest + dataOffset + destPos * Tpl.typeSize(),
-            length * Tpl.typeSize());
-  }*/
 }
