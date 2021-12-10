@@ -5,16 +5,10 @@ import static gc_less.TypeSizes.*;
 import static gc_less.Unsafer.getUnsafe;
 
 public class DoubleStack {
-  public static final int INITIAL_CAP = 10;
-
   private static final long lengthOffset = 0;
   private static final long refOffset = lengthOffset + INT_SIZE;
   private static final long capOffset = refOffset + LONG_SIZE;
   private static final long dataOffset = capOffset + INT_SIZE;
-
-  public static long allocate() {
-    return allocate(INITIAL_CAP);
-  }
 
   public static long allocate(int initialCapacity) {
     long addr = getUnsafe().allocateMemory(dataOffset + initialCapacity * DOUBLE_SIZE);

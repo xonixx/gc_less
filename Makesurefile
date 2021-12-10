@@ -4,9 +4,14 @@
   mvn compile
 
 @goal main3
+@doc 'Runs java with No-op GC (EpsilonGC)'
 @depends_on compiled
   java \
     -Xlog:gc \
     -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC \
     -Xms5m -Xmx5m \
     -cp target/classes gc_less.Main3
+
+@goal gen
+@doc 'Generate implementations by templates'
+  awk -f gen.awk

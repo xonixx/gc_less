@@ -1,29 +1,33 @@
-package gc_less.tpl;
+package gc_less;
 
-import gc_less.Ref;
 
-import static gc_less.TypeSizes.INT_SIZE;
-import static gc_less.TypeSizes.LONG_SIZE;
+import static gc_less.TypeSizes.*;
 import static gc_less.Unsafer.getUnsafe;
 
-public class TemplateStack {
+/** Resizable array (similar to ArrayList in Java) */
+public class DoubleArrayList {
   private static final long lengthOffset = 0;
   private static final long refOffset = lengthOffset + INT_SIZE;
   private static final long capOffset = refOffset + LONG_SIZE;
   private static final long dataOffset = capOffset + INT_SIZE;
 
   public static long allocate(int initialCapacity) {
-    long addr = getUnsafe().allocateMemory(dataOffset + initialCapacity * Tpl.typeSize());
+    long bytes = dataOffset + initialCapacity * DOUBLE_SIZE;
+    long addr = getUnsafe().allocateMemory(bytes);
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
     setRef(addr, Ref.create(addr));
     return addr;
   }
 
-  public static long push(long addr, @Type long value) {
+  public static void free(long address) {
+    getUnsafe().freeMemory(address);
+  }
+
+  public static long add(long addr, double value) {
     int len = getLength(addr);
     addr = ensureCapacity(addr, len);
-    Tpl.put(addr + dataOffset + len * Tpl.typeSize(), value);
+    getUnsafe().putDouble(addr + dataOffset + len * DOUBLE_SIZE, value);
     setLength(addr, ++len);
     return addr;
   }
@@ -32,25 +36,25 @@ public class TemplateStack {
     int capacity = getCapacity(addr);
     if (capacity == len) {
       setCapacity(addr, capacity = 2 * capacity);
-      long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * Tpl.typeSize());
+      long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * DOUBLE_SIZE);
       Ref.set(getRef(newAddr), newAddr);
       return newAddr;
     }
     return addr;
   }
 
-  public static @Type long pop(long addr) {
-    int len = getLength(addr);
-    setLength(addr, --len);
-    return Tpl.get(addr + dataOffset + len * Tpl.typeSize());
+  public static void set(long address, int index, double value) {
+    checkBoundaries(address, index);
+    getUnsafe().putDouble(address + dataOffset + index * DOUBLE_SIZE, value);
   }
 
-  public static @Type long peek(long addr) {
-    return Tpl.get(addr + dataOffset + (getLength(addr) - 1) * Tpl.typeSize());
+  public static double get(long address, int index) {
+    checkBoundaries(address, index);
+    return getUnsafe().getDouble(address + dataOffset + index * DOUBLE_SIZE);
   }
 
-  public static void free(long address) {
-    getUnsafe().freeMemory(address);
+  private static void checkBoundaries(long address, int index) {
+    if (index < 0 || index >= getLength(address)) throw new IndexOutOfBoundsException();
   }
 
   public static int getLength(long address) {
