@@ -31,14 +31,17 @@ public class IntArrayTests {
   public void testIllegalAccess() {
     long array = IntArray.allocate(10);
 
-    assertThrows(IndexOutOfBoundsException.class, () -> Integer.hashCode(IntArray.get(array, -1)));
-    assertThrows(IndexOutOfBoundsException.class, () -> IntArray.set(array, -1, 7));
+    for (int illegalIndex : new int[] {-1, 10}) {
+      assertThrows(
+          IndexOutOfBoundsException.class,
+          () -> Integer.hashCode(IntArray.get(array, illegalIndex)));
+      assertThrows(IndexOutOfBoundsException.class, () -> IntArray.set(array, illegalIndex, 7));
+    }
 
-    assertDoesNotThrow(() -> Integer.hashCode(IntArray.get(array, 5)));
-    assertDoesNotThrow(() -> IntArray.set(array, 5, 7));
-
-    assertThrows(IndexOutOfBoundsException.class, () -> Integer.hashCode(IntArray.get(array, 10)));
-    assertThrows(IndexOutOfBoundsException.class, () -> IntArray.set(array, -1, 10));
+    for (int legalIndex : new int[] {0, 5, 9}) {
+      assertDoesNotThrow(() -> Integer.hashCode(IntArray.get(array, legalIndex)));
+      assertDoesNotThrow(() -> IntArray.set(array, legalIndex, 7));
+    }
 
     IntArray.free(array);
   }
@@ -53,7 +56,7 @@ public class IntArrayTests {
     IntArray.set(array1, 9, 333);
 
     // WHEN
-    IntArray.arraycopy(array1,0, array2, 10, 10);
+    IntArray.arraycopy(array1, 0, array2, 10, 10);
 
     // THEN
     assertEquals(0, IntArray.get(array2, 0));
