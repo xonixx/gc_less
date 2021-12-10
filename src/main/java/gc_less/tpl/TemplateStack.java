@@ -13,6 +13,7 @@ public class TemplateStack {
   private static final long dataOffset = capOffset + INT_SIZE;
 
   public static long allocate(int initialCapacity) {
+    if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long addr = getUnsafe().allocateMemory(dataOffset + initialCapacity * Tpl.typeSize());
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);

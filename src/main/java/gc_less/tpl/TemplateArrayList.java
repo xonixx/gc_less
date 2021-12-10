@@ -14,6 +14,7 @@ public class TemplateArrayList {
   private static final long dataOffset = capOffset + INT_SIZE;
 
   public static long allocate(int initialCapacity) {
+    if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long bytes = dataOffset + initialCapacity * Tpl.typeSize();
     long addr = getUnsafe().allocateMemory(bytes);
     setLength(addr, 0);

@@ -2,11 +2,13 @@ package gc_less;
 
 import java.util.ArrayList;
 
+import static gc_less.Unsafer.getUnsafe;
+
 public class MainT1 {
   public static void main(String[] args) {
-    ArrayList a = new ArrayList();
-    a.add("hello");
-    a.set(0, "hello1");
-    System.out.println(a);
+    long mem = getUnsafe().allocateMemory(4);
+    getUnsafe().putInt(mem + 40, 123);
+    getUnsafe().freeMemory(mem);
+    System.out.println(getUnsafe().getInt(mem + 40));
   }
 }
