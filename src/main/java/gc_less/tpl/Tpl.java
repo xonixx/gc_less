@@ -15,4 +15,8 @@ public final class Tpl {
   public static long get(long address) {
     return Unsafer.getUnsafe().getLong(address);
   }
+
+  public static int hashCode(long value) {
+    return Long.hashCode(value);
+  }
 }
