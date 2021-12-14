@@ -1,5 +1,6 @@
 package gc_less.tpl;
 
+import gc_less.Allocator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,52 +8,53 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TemplateArrayListTests {
   @Test
   public void testCreate() {
-    // WHEN
-    long arrayList = TemplateArrayList.allocate(10);
+    try (Allocator allocator = Allocator.newFrame()) {
+      // WHEN
+      long arrayList = TemplateArrayList.allocate(allocator, 10);
 
-    // THEN
-    assertEquals(0, TemplateArrayList.getLength(arrayList));
-    assertEquals(10, TemplateArrayList.getCapacity(arrayList));
-
-    TemplateArrayList.free(arrayList);
+      // THEN
+      assertEquals(0, TemplateArrayList.getLength(arrayList));
+      assertEquals(10, TemplateArrayList.getCapacity(arrayList));
+    }
   }
 
   @Test
   public void testLegalAccess() {
-    // GIVEN
-    long arrayList = TemplateArrayList.allocate(10);
+    try (Allocator allocator = Allocator.newFrame()) {
+      // GIVEN
+      long arrayList = TemplateArrayList.allocate(allocator, 10);
 
-    // WHEN
-    arrayList = insertData(arrayList);
+      // WHEN
+      arrayList = insertData(arrayList);
 
-    // THEN
-    assertEquals(3, TemplateArrayList.getLength(arrayList));
-    assertEquals(10, TemplateArrayList.getCapacity(arrayList));
+      // THEN
+      assertEquals(3, TemplateArrayList.getLength(arrayList));
+      assertEquals(10, TemplateArrayList.getCapacity(arrayList));
 
-    assertEquals(111, TemplateArrayList.get(arrayList, 0));
-    assertEquals(222, TemplateArrayList.get(arrayList, 1));
-    assertEquals(333, TemplateArrayList.get(arrayList, 2));
-
-    TemplateArrayList.free(arrayList);
+      assertEquals(111, TemplateArrayList.get(arrayList, 0));
+      assertEquals(222, TemplateArrayList.get(arrayList, 1));
+      assertEquals(333, TemplateArrayList.get(arrayList, 2));
+    }
   }
 
   @Test
   public void testLegalAccessWithReallocations() {
-    // GIVEN
-    long arrayList = TemplateArrayList.allocate(1);
+    try (Allocator allocator = Allocator.newFrame()) {
 
-    // WHEN
-    arrayList = insertData(arrayList);
+      // GIVEN
+      long arrayList = TemplateArrayList.allocate(allocator, 1);
 
-    // THEN
-    assertEquals(3, TemplateArrayList.getLength(arrayList));
-    assertEquals(4, TemplateArrayList.getCapacity(arrayList));
+      // WHEN
+      arrayList = insertData(arrayList);
 
-    assertEquals(111, TemplateArrayList.get(arrayList, 0));
-    assertEquals(222, TemplateArrayList.get(arrayList, 1));
-    assertEquals(333, TemplateArrayList.get(arrayList, 2));
+      // THEN
+      assertEquals(3, TemplateArrayList.getLength(arrayList));
+      assertEquals(4, TemplateArrayList.getCapacity(arrayList));
 
-    TemplateArrayList.free(arrayList);
+      assertEquals(111, TemplateArrayList.get(arrayList, 0));
+      assertEquals(222, TemplateArrayList.get(arrayList, 1));
+      assertEquals(333, TemplateArrayList.get(arrayList, 2));
+    }
   }
 
   private long insertData(long arrayList) {
@@ -64,28 +66,28 @@ public class TemplateArrayListTests {
 
   @Test
   public void testIllegalAccess() {
-    // GIVEN
-    long arrayList = TemplateArrayList.allocate(10);
+    try (Allocator allocator = Allocator.newFrame()) {
+      // GIVEN
+      long arrayList = TemplateArrayList.allocate(allocator, 10);
 
-    // WHEN
-    arrayList = insertData(arrayList);
+      // WHEN
+      arrayList = insertData(arrayList);
 
-    // THEN
-    final long arrayListFinal = arrayList;
-    for (int illegalIndex : new int[] {-1, 10}) {
-      assertThrows(
-          IndexOutOfBoundsException.class,
-          () -> Long.hashCode(TemplateArrayList.get(arrayListFinal, illegalIndex)));
-      assertThrows(
-          IndexOutOfBoundsException.class,
-          () -> TemplateArrayList.set(arrayListFinal, illegalIndex, 7));
+      // THEN
+      final long arrayListFinal = arrayList;
+      for (int illegalIndex : new int[] {-1, 10}) {
+        assertThrows(
+            IndexOutOfBoundsException.class,
+            () -> Long.hashCode(TemplateArrayList.get(arrayListFinal, illegalIndex)));
+        assertThrows(
+            IndexOutOfBoundsException.class,
+            () -> TemplateArrayList.set(arrayListFinal, illegalIndex, 7));
+      }
+
+      for (int legalIndex : new int[] {0, 1, 2}) {
+        assertDoesNotThrow(() -> Long.hashCode(TemplateArrayList.get(arrayListFinal, legalIndex)));
+        assertDoesNotThrow(() -> TemplateArrayList.set(arrayListFinal, legalIndex, 7));
+      }
     }
-
-    for (int legalIndex : new int[] {0, 1, 2}) {
-      assertDoesNotThrow(() -> Long.hashCode(TemplateArrayList.get(arrayListFinal, legalIndex)));
-      assertDoesNotThrow(() -> TemplateArrayList.set(arrayListFinal, legalIndex, 7));
-    }
-
-    TemplateArrayList.free(arrayList);
   }
 }

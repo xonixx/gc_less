@@ -12,11 +12,19 @@ public class DoubleArrayList {
   private static final long dataOffset = capOffset + INT_SIZE;
 
   public static long allocate(int initialCapacity) {
+    return allocate(null, initialCapacity);
+  }
+  public static long allocate(Allocator allocator, int initialCapacity) {
+    if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long bytes = dataOffset + initialCapacity * DOUBLE_SIZE;
     long addr = getUnsafe().allocateMemory(bytes);
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
-    setRef(addr, Ref.create(addr));
+    long ref = Ref.create(addr);
+    setRef(addr, ref);
+    if (allocator!=null){
+      allocator.registerForCleanup(ref);
+    }
     return addr;
   }
 

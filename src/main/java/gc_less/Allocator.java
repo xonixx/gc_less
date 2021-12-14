@@ -15,19 +15,7 @@ public class Allocator implements AutoCloseable {
     return instance;
   }
 
-  public long newIntStack(int initialCapacity) {
-    long stack = IntStack.allocate(initialCapacity);
-    registerForCleanup(IntStack.getRef(stack));
-    return stack;
-  }
-
-  public long newLongStack(int initialCapacity) {
-    long stack = LongStack.allocate(initialCapacity);
-    registerForCleanup(LongStack.getRef(stack));
-    return stack;
-  }
-
-  private static void registerForCleanup(long ref) {
+  public void registerForCleanup(long ref) {
     long locals = LongStack.peek(stack);
     LongStack.push(locals, ref);
   }

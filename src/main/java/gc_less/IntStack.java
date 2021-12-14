@@ -11,10 +11,19 @@ public class IntStack {
   private static final long dataOffset = capOffset + INT_SIZE;
 
   public static long allocate(int initialCapacity) {
+    return allocate(null, initialCapacity);
+  }
+
+  public static long allocate(Allocator allocator, int initialCapacity) {
+    if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long addr = getUnsafe().allocateMemory(dataOffset + initialCapacity * INT_SIZE);
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
-    setRef(addr, Ref.create(addr));
+    long ref = Ref.create(addr);
+    setRef(addr, ref);
+    if (allocator != null) {
+      allocator.registerForCleanup(ref);
+    }
     return addr;
   }
 

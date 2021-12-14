@@ -13,7 +13,7 @@ public class Main4 {
     int N = 500_000_000;
     //    int N = 100_000_000;
     try (Allocator allocator = Allocator.newFrame()) {
-      long stack = allocator.newIntStack(10);
+      long stack = IntStack.allocate(allocator, 10);
       for (int i = 0; i < N; i++) {
         long oldStack = stack;
         stack = IntStack.push(stack, i);

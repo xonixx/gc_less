@@ -1,5 +1,6 @@
 package gc_less;
 
+
 import static gc_less.TypeSizes.*;
 import static gc_less.Unsafer.getUnsafe;
 
@@ -9,10 +10,17 @@ public class DoubleArray {
   private static final long dataOffset = lengthOffset + INT_SIZE;
 
   public static long allocate(int length) {
+    return allocate(null, length);
+  }
+
+  public static long allocate(Allocator allocator, int length) {
     long bytes = dataOffset + length * DOUBLE_SIZE;
     long addr = getUnsafe().allocateMemory(bytes);
     getUnsafe().setMemory(addr, bytes, (byte) 0);
     setLength(addr, length);
+    if (allocator != null) {
+      allocator.registerForCleanup(Ref.create(addr));
+    }
     return addr;
   }
 

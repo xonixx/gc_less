@@ -1,11 +1,10 @@
-package gc_less.tpl;
+package gc_less;
 
-import gc_less.Ref;
 
 import static gc_less.TypeSizes.*;
 import static gc_less.Unsafer.getUnsafe;
 
-public class TemplateHashtable {
+public class LongHashtable {
 
   private static final long sizeOffset = 0;
   private static final long refOffset = sizeOffset + INT_SIZE;
@@ -15,7 +14,7 @@ public class TemplateHashtable {
 
   public static long allocate(int initialCapacity, float loadFactor) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
-    long addr = getUnsafe().allocateMemory(bucketsOffset + initialCapacity * Tpl.typeSize());
+    long addr = getUnsafe().allocateMemory(bucketsOffset + initialCapacity * LONG_SIZE);
     setSize(addr, 0);
     setLoadFactor(addr, loadFactor);
     setCapacity(addr, initialCapacity);
@@ -23,19 +22,19 @@ public class TemplateHashtable {
     return addr;
   }
 
-  public static @Type long put(long address, @Type long key, @Type long value) {
+  public static long put(long address, long key, long value) {
     throw new UnsupportedOperationException("TBD");
   }
 
-  public static @Type long get(long address, @Type long key) {
+  public static long get(long address, long key) {
     throw new UnsupportedOperationException("TBD");
   }
 
-  public static boolean containsKey(long address, @Type long key) {
+  public static boolean containsKey(long address, long key) {
     throw new UnsupportedOperationException("TBD");
   }
 
-  public static @Type long remove(long address, @Type long key) {
+  public static long remove(long address, long key) {
     throw new UnsupportedOperationException("TBD");
   }
 
