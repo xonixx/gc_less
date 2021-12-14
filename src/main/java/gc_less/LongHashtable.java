@@ -42,6 +42,12 @@ public class LongHashtable {
     throw new UnsupportedOperationException("TBD");
   }
 
+  public static long keys(long address, Allocator allocator) {
+    long keysArrayAddr = LongArray.allocate(allocator, getSize(address));
+    // TODO implement
+    return keysArrayAddr;
+  }
+
   public static boolean isEmpty(long address) {
     return 0 == getSize(address);
   }

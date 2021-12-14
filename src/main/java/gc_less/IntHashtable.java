@@ -42,6 +42,12 @@ public class IntHashtable {
     throw new UnsupportedOperationException("TBD");
   }
 
+  public static long keys(long address, Allocator allocator) {
+    long keysArrayAddr = IntArray.allocate(allocator, getSize(address));
+    // TODO implement
+    return keysArrayAddr;
+  }
+
   public static boolean isEmpty(long address) {
     return 0 == getSize(address);
   }

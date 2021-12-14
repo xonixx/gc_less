@@ -1,5 +1,6 @@
 package gc_less.tpl;
 
+import gc_less.Allocator;
 import gc_less.Ref;
 
 import static gc_less.TypeSizes.*;
@@ -41,6 +42,12 @@ public class TemplateHashtable {
 
   public static void clear(long address) {
     throw new UnsupportedOperationException("TBD");
+  }
+
+  public static long keys(long address, Allocator allocator) {
+    long keysArrayAddr = TemplateArray.allocate(allocator, getSize(address));
+    // TODO implement
+    return keysArrayAddr;
   }
 
   public static boolean isEmpty(long address) {

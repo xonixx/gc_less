@@ -14,6 +14,7 @@ public class LongArrayList {
   public static long allocate(int initialCapacity) {
     return allocate(null, initialCapacity);
   }
+
   public static long allocate(Allocator allocator, int initialCapacity) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long bytes = dataOffset + initialCapacity * LONG_SIZE;
@@ -22,7 +23,7 @@ public class LongArrayList {
     setCapacity(addr, initialCapacity);
     long ref = Ref.create(addr);
     setRef(addr, ref);
-    if (allocator!=null){
+    if (allocator != null) {
       allocator.registerForCleanup(ref);
     }
     return addr;

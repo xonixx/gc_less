@@ -25,9 +25,8 @@ function processTemplate(tplFolder, tplFileName,   tplFile,type,outFile,line,lcf
 
     typeSizesDone=0
     while (getline line < tplFile) {
-      if (line ~ /^public class/)
-        sub(/Template/, lcfType, line)
-      else if(line ~ /^package/)
+      gsub(/Template/, lcfType, line)
+      if (line ~ /^package/)
         line = "package gc_less;"
       else if (line ~ /import static gc_less\.TypeSizes\./)
         if (!typeSizesDone++)
