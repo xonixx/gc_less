@@ -15,45 +15,53 @@ public class TemplateHashtable {
   private static final long bucketsOffset = loadFactorOffset + FLOAT_SIZE;
 
   private static class Node {
+    // hash int, key type, value type, next long
+    private static final long hashOffset = 0;
+    private static final long keyOffset = hashOffset + INT_SIZE;
+    private static final long valueOffset = keyOffset + Tpl.typeSize();
+    private static final long nextOffset = valueOffset + Tpl.typeSize();
+    private static final long totalMemToAllocate = nextOffset + LONG_SIZE;
+
     static long allocate() {
-      throw new UnsupportedOperationException("TBD");
+      long addr = getUnsafe().allocateMemory(totalMemToAllocate);
+      getUnsafe().setMemory(addr, totalMemToAllocate, (byte) 0);
+      return addr;
     }
 
     static void free(long address) {
-      throw new UnsupportedOperationException("TBD");
+      getUnsafe().freeMemory(address);
     }
 
     static int getHash(long address) {
-      throw new UnsupportedOperationException("TBD");
+      return getUnsafe().getInt(address + hashOffset);
     }
 
     static @Type long getKey(long address) {
-      throw new UnsupportedOperationException("TBD");
+      return Tpl.get(address + keyOffset);
     }
 
     static @Type long getValue(long address) {
-      throw new UnsupportedOperationException("TBD");
+      return Tpl.get(address + valueOffset);
     }
 
     static long getNext(long address) {
-      return 0;
-      //      throw new UnsupportedOperationException("TBD");
+      return getUnsafe().getLong(address + nextOffset);
     }
 
     static void setHash(long address, int hash) {
-      throw new UnsupportedOperationException("TBD");
+      getUnsafe().putInt(address + hashOffset, hash);
     }
 
     static void setKey(long address, @Type long key) {
-      throw new UnsupportedOperationException("TBD");
+      Tpl.put(address + keyOffset, key);
     }
 
     static void setValue(long address, @Type long value) {
-      throw new UnsupportedOperationException("TBD");
+      Tpl.put(address + valueOffset, value);
     }
 
     static void setNext(long address, long nextNodeAddress) {
-      throw new UnsupportedOperationException("TBD");
+      getUnsafe().putLong(address + nextOffset, nextNodeAddress);
     }
   }
 
@@ -85,21 +93,33 @@ public class TemplateHashtable {
       Node.setValue(node, value);
       Node.setNext(node, 0);
       getUnsafe().putLong(bucketAddr, node);
+      changeSize(address, 1);
     } else {
-      for (long prevNode = 0, node = bucketNode; node != 0; node = Node.getNext(node)) {
+      boolean found = false;
+      for (long node = bucketNode; node != 0; node = Node.getNext(node)) {
         @Type long nodeKey = Node.getKey(node);
         if (nodeKey == key) {
           // replace node
           Node.setHash(node, hashCode);
           Node.setValue(node, value);
-
+          found = true;
           break;
         }
-        prevNode = node;
+      }
+      if (!found) {
+        // insert
+        long node = Node.allocate();
+        Node.setKey(node, key);
+        Node.setHash(node, hashCode);
+        Node.setValue(node, value);
+        Node.setNext(node, bucketNode);
+        getUnsafe().putLong(bucketAddr, node);
+        changeSize(address, 1);
       }
     }
 
-    throw new UnsupportedOperationException("TBD");
+    // TODO reallocate
+    return address;
   }
 
   public static @Type long get(long address, @Type long key) {
@@ -134,6 +154,10 @@ public class TemplateHashtable {
 
   private static void setSize(long address, int size) {
     getUnsafe().putInt(address, size);
+  }
+
+  private static void changeSize(long address, int delta) {
+    setSize(address, getSize(address) + delta);
   }
 
   public static float getLoadFactor(long address) {
