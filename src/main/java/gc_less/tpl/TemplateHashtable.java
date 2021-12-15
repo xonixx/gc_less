@@ -185,8 +185,8 @@ public class TemplateHashtable {
   }
 
   public static void clear(long address) {
-    int size = getSize(address);
-    for (int bucketIdx = 0; bucketIdx < size; bucketIdx++) {
+    int capacity = getCapacity(address);
+    for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
       long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketNode = getUnsafe().getLong(bucketAddr);
 
@@ -200,7 +200,18 @@ public class TemplateHashtable {
 
   public static long keys(long address, Allocator allocator) {
     long keysArrayAddr = TemplateArray.allocate(allocator, getSize(address));
-    // TODO implement
+    int capacity = getCapacity(address);
+    for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
+      long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+      long bucketNode = getUnsafe().getLong(bucketAddr);
+
+      int i = 0;
+      for (long node = bucketNode; 0 != node; ) {
+        long next = Node.getNext(node);
+        TemplateArray.set(keysArrayAddr, i++, Node.getValue(node));
+        node = next;
+      }
+    }
     return keysArrayAddr;
   }
 
