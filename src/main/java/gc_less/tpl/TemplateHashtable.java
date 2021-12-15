@@ -77,7 +77,7 @@ public class TemplateHashtable {
     return addr;
   }
 
-  public static @Type long put(long address, @Type long key, @Type long value) {
+  public static long put(long address, @Type long key, @Type long value) {
 
     int hashCode = Tpl.hashCode(key);
 
@@ -123,15 +123,67 @@ public class TemplateHashtable {
   }
 
   public static @Type long get(long address, @Type long key) {
-    throw new UnsupportedOperationException("TBD");
+    int hashCode = Tpl.hashCode(key);
+
+    int bucketIdx = hashCode % getCapacity(address);
+
+    long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+    long bucketNode = getUnsafe().getLong(bucketAddr);
+
+    for (long node = bucketNode; node != 0; node = Node.getNext(node)) {
+      @Type long nodeKey = Node.getKey(node);
+      if (nodeKey == key) {
+        return Node.getValue(node);
+      }
+    }
+    return 0; // TODO how we distinguish 0 from absent???
   }
 
   public static boolean containsKey(long address, @Type long key) {
-    throw new UnsupportedOperationException("TBD");
+    int hashCode = Tpl.hashCode(key);
+
+    int bucketIdx = hashCode % getCapacity(address);
+
+    long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+    long bucketNode = getUnsafe().getLong(bucketAddr);
+
+    for (long node = bucketNode; node != 0; node = Node.getNext(node)) {
+      @Type long nodeKey = Node.getKey(node);
+      if (nodeKey == key) {
+        return true;
+      }
+    }
+    return false;
   }
 
+  /**
+   * @return removed value for key
+   */
   public static @Type long remove(long address, @Type long key) {
-    throw new UnsupportedOperationException("TBD");
+    int hashCode = Tpl.hashCode(key);
+
+    int bucketIdx = hashCode % getCapacity(address);
+
+    long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+    long bucketNode = getUnsafe().getLong(bucketAddr);
+
+    for (long prevNode = 0, node = bucketNode; node != 0; node = Node.getNext(node)) {
+      @Type long nodeKey = Node.getKey(node);
+      if (nodeKey == key) {
+        // remove node
+        @Type long value = Node.getValue(node);
+        if (prevNode != 0) {
+          Node.setNext(prevNode, Node.getNext(node));
+        } else {
+          // this was first node
+          getUnsafe().putLong(bucketAddr, 0);
+        }
+        Node.free(node);
+        return value;
+      }
+      prevNode = node;
+    }
+    return 0; // TODO how we distinguish 0 from absent???
   }
 
   public static void clear(long address) {
