@@ -81,7 +81,8 @@ public class TemplateHashtable {
 
     int hashCode = Tpl.hashCode(key);
 
-    int bucketIdx = hashCode % getCapacity(address);
+    int capacity = getCapacity(address);
+    int bucketIdx = hashCode % capacity;
 
     long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
     long bucketNode = getUnsafe().getLong(bucketAddr);
@@ -118,8 +119,29 @@ public class TemplateHashtable {
       }
     }
 
-    // TODO reallocate
-    return address;
+    return resizeIfNeeded(address, capacity);
+  }
+
+  private static long resizeIfNeeded(long address, int capacity) {
+    float loadFactor = getLoadFactor(address);
+    if (getSize(address) / (float) capacity < loadFactor) {
+      return address; // no change
+    }
+
+    int newCapacity = capacity * 2;
+    long newAddress = TemplateHashtable.allocate(newCapacity, loadFactor);
+
+    for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
+      long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+      long bucketNode = getUnsafe().getLong(bucketAddr);
+
+      for (long node = bucketNode; 0 != node; node=Node.getNext(node)) {
+        TemplateHashtable.put(newAddress, Node.getKey(node), Node.getValue(node));
+      }
+    }
+
+    TemplateHashtable.free(address);
+    return newAddress;
   }
 
   public static @Type long get(long address, @Type long key) {
