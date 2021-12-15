@@ -156,9 +156,7 @@ public class TemplateHashtable {
     return false;
   }
 
-  /**
-   * @return removed value for key
-   */
+  /** @return removed value for key */
   public static @Type long remove(long address, @Type long key) {
     int hashCode = Tpl.hashCode(key);
 
@@ -187,7 +185,17 @@ public class TemplateHashtable {
   }
 
   public static void clear(long address) {
-    throw new UnsupportedOperationException("TBD");
+    int size = getSize(address);
+    for (int bucketIdx = 0; bucketIdx < size; bucketIdx++) {
+      long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+      long bucketNode = getUnsafe().getLong(bucketAddr);
+
+      for (long node = bucketNode; 0 != node; ) {
+        long next = Node.getNext(node);
+        Node.free(node);
+        node = next;
+      }
+    }
   }
 
   public static long keys(long address, Allocator allocator) {
@@ -237,7 +245,7 @@ public class TemplateHashtable {
   }
 
   public static void free(long address) {
+    clear(address); // TODO is this enough?
     getUnsafe().freeMemory(address);
-    throw new UnsupportedOperationException("TBD");
   }
 }
