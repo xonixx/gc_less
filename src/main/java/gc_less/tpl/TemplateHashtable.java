@@ -20,14 +20,14 @@ public class TemplateHashtable {
         new StringBuilder()
             .append("{size=")
             .append(getSize(address))
-            .append("\n,cap=")
+            .append(",cap=")
             .append(capacity)
-            .append("\n,lf=")
+            .append(",lf=")
             .append(getLoadFactor(address))
-            .append("buckets=[\n");
+            .append(",\nbuckets=[\n");
 
     for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
-      long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+      long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketNode = getUnsafe().getLong(bucketAddr);
 
       if (bucketNode != 0) {
@@ -36,6 +36,7 @@ public class TemplateHashtable {
           sb.append(Node.toString(node)).append("->");
         }
         sb.setLength(sb.length() - 2);
+        sb.append("\n");
       }
     }
 
@@ -98,7 +99,7 @@ public class TemplateHashtable {
     }
   }
 
-  public static long allocate(int initialCapacity, float loadFactor) {
+  public static long allocate(Allocator allocator/* TODO */, int initialCapacity, float loadFactor) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long bytes = bucketsOffset + initialCapacity * LONG_SIZE;
     long addr = getUnsafe().allocateMemory(bytes);
@@ -117,7 +118,7 @@ public class TemplateHashtable {
     int capacity = getCapacity(address);
     int bucketIdx = hashCode % capacity;
 
-    long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+    long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
     long bucketNode = getUnsafe().getLong(bucketAddr);
 
     if (bucketNode == 0) { // empty bucket
@@ -162,10 +163,11 @@ public class TemplateHashtable {
     }
 
     int newCapacity = capacity * 2;
-    long newAddress = TemplateHashtable.allocate(newCapacity, loadFactor);
+    long newAddress = TemplateHashtable.allocate(null, newCapacity, loadFactor);
+    Ref.set(getRef(newAddress), newAddress);
 
     for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
-      long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+      long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketNode = getUnsafe().getLong(bucketAddr);
 
       for (long node = bucketNode; 0 != node; node = Node.getNext(node)) {
@@ -182,7 +184,7 @@ public class TemplateHashtable {
 
     int bucketIdx = hashCode % getCapacity(address);
 
-    long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+    long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
     long bucketNode = getUnsafe().getLong(bucketAddr);
 
     for (long node = bucketNode; node != 0; node = Node.getNext(node)) {
@@ -199,7 +201,7 @@ public class TemplateHashtable {
 
     int bucketIdx = hashCode % getCapacity(address);
 
-    long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+    long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
     long bucketNode = getUnsafe().getLong(bucketAddr);
 
     for (long node = bucketNode; node != 0; node = Node.getNext(node)) {
@@ -217,7 +219,7 @@ public class TemplateHashtable {
 
     int bucketIdx = hashCode % getCapacity(address);
 
-    long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+    long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
     long bucketNode = getUnsafe().getLong(bucketAddr);
 
     for (long prevNode = 0, node = bucketNode; node != 0; node = Node.getNext(node)) {
@@ -242,7 +244,7 @@ public class TemplateHashtable {
   public static void clear(long address) {
     int capacity = getCapacity(address);
     for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
-      long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+      long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketNode = getUnsafe().getLong(bucketAddr);
 
       for (long node = bucketNode; 0 != node; ) {
@@ -257,7 +259,7 @@ public class TemplateHashtable {
     long keysArrayAddr = TemplateArray.allocate(allocator, getSize(address));
     int capacity = getCapacity(address);
     for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
-      long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+      long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketNode = getUnsafe().getLong(bucketAddr);
 
       int i = 0;
