@@ -14,6 +14,35 @@ public class TemplateHashtable {
   private static final long loadFactorOffset = capOffset + INT_SIZE;
   private static final long bucketsOffset = loadFactorOffset + FLOAT_SIZE;
 
+  public static String toString(long address) {
+    int capacity = getCapacity(address);
+    StringBuilder sb =
+        new StringBuilder()
+            .append("{size=")
+            .append(getSize(address))
+            .append("\n,cap=")
+            .append(capacity)
+            .append("\n,lf=")
+            .append(getLoadFactor(address))
+            .append("buckets=[\n");
+
+    for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
+      long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
+      long bucketNode = getUnsafe().getLong(bucketAddr);
+
+      if (bucketNode != 0) {
+        sb.append("  ").append(bucketIdx).append("->");
+        for (long node = bucketNode; 0 != node; node = Node.getNext(node)) {
+          sb.append(Node.toString(node)).append("->");
+        }
+        sb.setLength(sb.length() - 2);
+      }
+    }
+
+    sb.append("]}");
+    return sb.toString();
+  }
+
   private static class Node {
     // hash int, key type, value type, next long
     private static final long hashOffset = 0;
@@ -62,6 +91,10 @@ public class TemplateHashtable {
 
     static void setNext(long address, long nextNodeAddress) {
       getUnsafe().putLong(address + nextOffset, nextNodeAddress);
+    }
+
+    public static String toString(long address) {
+      return "{k=" + getKey(address) + ",v=" + getValue(address) + ",h=" + getHash(address) + "}";
     }
   }
 
@@ -135,7 +168,7 @@ public class TemplateHashtable {
       long bucketAddr = bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketNode = getUnsafe().getLong(bucketAddr);
 
-      for (long node = bucketNode; 0 != node; node=Node.getNext(node)) {
+      for (long node = bucketNode; 0 != node; node = Node.getNext(node)) {
         TemplateHashtable.put(newAddress, Node.getKey(node), Node.getValue(node));
       }
     }
