@@ -234,11 +234,13 @@ public class TemplateHashtable {
           getUnsafe().putLong(bucketAddr, 0);
         }
         Node.free(node);
+        changeSize(address, -1);
         return value;
       }
       prevNode = node;
     }
     return 0; // TODO how we distinguish 0 from absent???
+    // TODO shrink down?
   }
 
   public static void clear(long address) {
