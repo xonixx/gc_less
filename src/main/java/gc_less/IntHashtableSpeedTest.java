@@ -5,9 +5,14 @@ import java.util.Map;
 
 public class IntHashtableSpeedTest {
   static final int N = 1000_000;
+//  static final int INITIAL_CAP = 16;
+    static final int INITIAL_CAP = 2000_000;
+  static final int WARM_UP_ITERATIONS = 10;
 
   public static void main(String[] args) {
-    warmUp();
+    for (int i = 0; i < WARM_UP_ITERATIONS; i++) {
+      warmUp();
+    }
 
     long t0 = System.currentTimeMillis();
     testJavaHashMap();
@@ -25,7 +30,7 @@ public class IntHashtableSpeedTest {
   }
 
   private static void testJavaHashMap() {
-    Map<Integer, Integer> javaMap = new HashMap<>();
+    Map<Integer, Integer> javaMap = new HashMap<>(INITIAL_CAP);
     for (int i = 0; i < N; i++) {
       javaMap.put(i, i);
     }
@@ -37,7 +42,7 @@ public class IntHashtableSpeedTest {
   }
 
   private static void testGcLessHashMap() {
-    long gcLessMap = IntHashtable.allocate(null, 16, .75f); // like in HashMap
+    long gcLessMap = IntHashtable.allocate(null, INITIAL_CAP, .75f); // like in HashMap
     for (int i = 0; i < N; i++) {
       gcLessMap = IntHashtable.put(gcLessMap, i, i);
     }
