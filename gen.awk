@@ -1,7 +1,7 @@
 BEGIN {
   TPL_FOLDER = "src/main/java/gc_less/tpl"
   OUT_FOLDER = "src/main/java/gc_less"
-  GEN["int"]
+  GEN["int"]="Integer"
   GEN["long"]
   GEN["double"]
   gen()
@@ -45,6 +45,7 @@ function processTemplate(tplFolder, tplFileName,   tplFile,type,outFile,line,lcf
         gsub(/Tpl\.typeSize\(\)/, toupper(type) "_SIZE", line)
         gsub(/Tpl\.put\(/, "getUnsafe().put" lcfType "(", line)
         gsub(/Tpl\.get\(/, "getUnsafe().get" lcfType "(", line)
+        gsub(/Tpl\.hashCode\(/, (GEN[type] ? GEN[type] : lcfType) ".hashCode(", line)
       }
       print line >> outFile
     }
