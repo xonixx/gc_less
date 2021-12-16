@@ -5,8 +5,8 @@ import java.util.Map;
 
 public class IntHashtableSpeedTest {
   static final int N = 1000_000;
-//  static final int INITIAL_CAP = 16;
-    static final int INITIAL_CAP = 2000_000;
+  //  static final int INITIAL_CAP = 16;
+  static final int INITIAL_CAP = 2000_000;
   static final int WARM_UP_ITERATIONS = 10;
 
   public static void main(String[] args) {
@@ -38,6 +38,12 @@ public class IntHashtableSpeedTest {
     for (int i = 0; i < N; i++) {
       tot += javaMap.get(i);
     }
+    for (int i = 0; i < N; i++) {
+      tot += javaMap.remove(i);
+    }
+    for (int i = 0; i < N; i++) {
+      tot += javaMap.getOrDefault(i, 0);
+    }
     System.out.println("tot=" + tot);
   }
 
@@ -47,6 +53,12 @@ public class IntHashtableSpeedTest {
       gcLessMap = IntHashtable.put(gcLessMap, i, i);
     }
     int tot = 0;
+    for (int i = 0; i < N; i++) {
+      tot += IntHashtable.get(gcLessMap, i);
+    }
+    for (int i = 0; i < N; i++) {
+      tot += IntHashtable.remove(gcLessMap, i);
+    }
     for (int i = 0; i < N; i++) {
       tot += IntHashtable.get(gcLessMap, i);
     }
