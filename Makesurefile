@@ -1,7 +1,12 @@
 
+@goal gen
+@doc 'Generate implementations by templates'
+  awk -f gen.awk
 
 @goal compiled @private
-  mvn compile
+@depends_on gen
+#  mvn compile
+  javac src/main/java/gc_less/*.java src/main/java/gc_less/*/*.java -d target/classes
 
 @goal main4
 @doc 'Runs java with No-op GC (EpsilonGC)'
@@ -11,7 +16,3 @@
     -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC \
     -Xms5m -Xmx5m \
     -cp target/classes gc_less.Main4
-
-@goal gen
-@doc 'Generate implementations by templates'
-  awk -f gen.awk
