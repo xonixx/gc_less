@@ -57,6 +57,16 @@ public class TemplateArrayList {
     return addr;
   }
 
+  public static @Type long remove(long addr, int index) {
+    @Type long result = get(addr, index);
+    int len = getLength(addr);
+    long indexAddr = addr + dataOffset + index * Tpl.typeSize();
+    Unsafer.getUnsafe()
+        .copyMemory(indexAddr + Tpl.typeSize(), indexAddr, (len - index - 1) * Tpl.typeSize());
+    setLength(addr, --len);
+    return result;
+  }
+
   private static long ensureCapacity(long addr, int len) {
     int capacity = getCapacity(addr);
     if (capacity == len) {
