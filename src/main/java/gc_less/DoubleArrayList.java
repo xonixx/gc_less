@@ -41,6 +41,28 @@ public class DoubleArrayList {
     return addr;
   }
 
+  public static long add(long addr, int index, double value) {
+    checkBoundaries(addr, index);
+    int len = getLength(addr);
+    addr = ensureCapacity(addr, len);
+    long indexAddr = addr + dataOffset + index * DOUBLE_SIZE;
+    Unsafer.getUnsafe()
+        .copyMemory(indexAddr, indexAddr + DOUBLE_SIZE, (len - index) * DOUBLE_SIZE);
+    getUnsafe().putDouble(indexAddr, value);
+    setLength(addr, ++len);
+    return addr;
+  }
+
+  public static double remove(long addr, int index) {
+    double result = get(addr, index);
+    int len = getLength(addr);
+    long indexAddr = addr + dataOffset + index * DOUBLE_SIZE;
+    Unsafer.getUnsafe()
+        .copyMemory(indexAddr + DOUBLE_SIZE, indexAddr, (len - index - 1) * DOUBLE_SIZE);
+    setLength(addr, --len);
+    return result;
+  }
+
   private static long ensureCapacity(long addr, int len) {
     int capacity = getCapacity(addr);
     if (capacity == len) {

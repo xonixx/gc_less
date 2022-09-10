@@ -41,6 +41,28 @@ public class LongArrayList {
     return addr;
   }
 
+  public static long add(long addr, int index, long value) {
+    checkBoundaries(addr, index);
+    int len = getLength(addr);
+    addr = ensureCapacity(addr, len);
+    long indexAddr = addr + dataOffset + index * LONG_SIZE;
+    Unsafer.getUnsafe()
+        .copyMemory(indexAddr, indexAddr + LONG_SIZE, (len - index) * LONG_SIZE);
+    getUnsafe().putLong(indexAddr, value);
+    setLength(addr, ++len);
+    return addr;
+  }
+
+  public static long remove(long addr, int index) {
+    long result = get(addr, index);
+    int len = getLength(addr);
+    long indexAddr = addr + dataOffset + index * LONG_SIZE;
+    Unsafer.getUnsafe()
+        .copyMemory(indexAddr + LONG_SIZE, indexAddr, (len - index - 1) * LONG_SIZE);
+    setLength(addr, --len);
+    return result;
+  }
+
   private static long ensureCapacity(long addr, int len) {
     int capacity = getCapacity(addr);
     if (capacity == len) {
