@@ -1,4 +1,4 @@
-
+# vim: syntax=bash
 @goal gen
 @doc 'Generate implementations by templates'
   awk -f gen.awk
