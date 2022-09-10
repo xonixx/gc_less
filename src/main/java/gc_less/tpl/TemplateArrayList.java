@@ -46,10 +46,12 @@ public class TemplateArrayList {
   }
 
   public static long add(long addr, int index, @Type long value) {
+    checkBoundaries(addr, index);
     int len = getLength(addr);
     addr = ensureCapacity(addr, len);
     long indexAddr = addr + dataOffset + index * Tpl.typeSize();
-    Unsafer.getUnsafe().copyMemory(indexAddr, indexAddr + 1, (len - index) * Tpl.typeSize());
+    Unsafer.getUnsafe()
+        .copyMemory(indexAddr, indexAddr + Tpl.typeSize(), (len - index) * Tpl.typeSize());
     Tpl.put(indexAddr, value);
     setLength(addr, ++len);
     return addr;

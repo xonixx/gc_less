@@ -66,7 +66,7 @@ public class TemplateArrayListTests {
       // WHEN
       arrayList = TemplateArrayList.add(arrayList, 111);
       arrayList = TemplateArrayList.add(arrayList, 222);
-      arrayList = TemplateArrayList.add(arrayList, 1,333);
+      arrayList = TemplateArrayList.add(arrayList, 1, 333);
 
       // THEN
       assertEquals(3, TemplateArrayList.getLength(arrayList));
@@ -109,6 +109,23 @@ public class TemplateArrayListTests {
         assertDoesNotThrow(() -> Long.hashCode(TemplateArrayList.get(arrayListFinal, legalIndex)));
         assertDoesNotThrow(() -> TemplateArrayList.set(arrayListFinal, legalIndex, 7));
       }
+    }
+  }
+
+  @Test
+  public void testIllegalAccessInsert() {
+    try (Allocator allocator = Allocator.newFrame()) {
+      // GIVEN
+      long arrayList = TemplateArrayList.allocate(allocator, 10);
+
+      // WHEN
+      arrayList = insertData(arrayList);
+
+      // THEN
+      final long arrayListFinal = arrayList;
+      assertThrows(
+          IndexOutOfBoundsException.class,
+          () -> Long.hashCode(TemplateArrayList.add(arrayListFinal, 5, 7)));
     }
   }
 }
