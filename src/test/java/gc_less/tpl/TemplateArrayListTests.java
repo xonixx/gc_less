@@ -57,6 +57,27 @@ public class TemplateArrayListTests {
     }
   }
 
+  @Test
+  public void testInserts() {
+    try (Allocator allocator = Allocator.newFrame()) {
+      // GIVEN
+      long arrayList = TemplateArrayList.allocate(allocator, 10);
+
+      // WHEN
+      arrayList = TemplateArrayList.add(arrayList, 111);
+      arrayList = TemplateArrayList.add(arrayList, 222);
+      arrayList = TemplateArrayList.add(arrayList, 1,333);
+
+      // THEN
+      assertEquals(3, TemplateArrayList.getLength(arrayList));
+      assertEquals(10, TemplateArrayList.getCapacity(arrayList));
+
+      assertEquals(111, TemplateArrayList.get(arrayList, 0));
+      assertEquals(333, TemplateArrayList.get(arrayList, 1));
+      assertEquals(222, TemplateArrayList.get(arrayList, 2));
+    }
+  }
+
   private long insertData(long arrayList) {
     arrayList = TemplateArrayList.add(arrayList, 111);
     arrayList = TemplateArrayList.add(arrayList, 222);

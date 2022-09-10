@@ -2,6 +2,7 @@ package gc_less.tpl;
 
 import gc_less.Allocator;
 import gc_less.Ref;
+import gc_less.Unsafer;
 
 import static gc_less.TypeSizes.INT_SIZE;
 import static gc_less.TypeSizes.LONG_SIZE;
@@ -40,6 +41,16 @@ public class TemplateArrayList {
     int len = getLength(addr);
     addr = ensureCapacity(addr, len);
     Tpl.put(addr + dataOffset + len * Tpl.typeSize(), value);
+    setLength(addr, ++len);
+    return addr;
+  }
+
+  public static long add(long addr, int index, @Type long value) {
+    int len = getLength(addr);
+    addr = ensureCapacity(addr, len);
+    long indexAddr = addr + dataOffset + index * Tpl.typeSize();
+    Unsafer.getUnsafe().copyMemory(indexAddr, indexAddr + 1, (len - index) * Tpl.typeSize());
+    Tpl.put(indexAddr, value);
     setLength(addr, ++len);
     return addr;
   }
