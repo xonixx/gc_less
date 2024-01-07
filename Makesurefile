@@ -1,17 +1,26 @@
 # vim: syntax=bash
+
+@define JAVA_BIN "$HOME/.sdkman/candidates/java/23.ea.3-open/bin"
+@define JAVA     "$JAVA_BIN/java"
+@define JAVAC    "$JAVA_BIN/javac"
+
 @goal gen
 @doc 'Generate implementations by templates'
   awk -f gen.awk
 
+@goal java_version
+  $JAVA -version
+
 @goal compiled @private
 @depends_on gen
+@depends_on java_version
 #  mvn compile
-  javac src/main/java/gc_less/*.java src/main/java/gc_less/*/*.java -d target/classes
+  $JAVAC src/main/java/gc_less/*.java src/main/java/gc_less/*/*.java -d target/classes
 
 @goal main4
 @doc 'Runs java with No-op GC (EpsilonGC)'
 @depends_on compiled
-  java \
+  $JAVA \
     -Xlog:gc \
     -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC \
     -Xms5m -Xmx5m \
