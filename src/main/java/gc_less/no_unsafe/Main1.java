@@ -7,7 +7,8 @@ import java.util.function.Consumer;
 public class Main1 {
   public static void main(String[] args) throws Throwable {
     try(Arena arena = Arena.ofShared()) {
-      MemorySegment memorySegment = allocateMemory(5000_000_000_000L, arena);
+      MemorySegment memorySegment = allocateMemory(500_000_000L, arena);
+      memorySegment.fill((byte) 1);
       System.out.println(memorySegment.byteSize());
       Thread.sleep(5000);
     }
