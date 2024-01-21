@@ -25,3 +25,6 @@
     -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC \
     -Xms5m -Xmx5m \
     -cp target/classes gc_less.Main4
+
+@goal new1
+mvn compile exec:java -Dexec.mainClass="gc_less.no_unsafe.Main1"
