@@ -1,6 +1,6 @@
 package gc_less.no_unsafe.tpl;
 
-import static gc_less.TypeSizes.INT_SIZE;
+import static gc_less.TypeSizes.LONG_SIZE;
 // import static gc_less.Unsafer.getUnsafe;
 
 import gc_less.no_unsafe.NativeMem;
@@ -12,7 +12,8 @@ import java.lang.foreign.ValueLayout;
 /** Non-resizable array (similar to arrays in Java) */
 public class TemplateArray {
   private static final long lengthOffset = 0;
-  private static final long dataOffset = lengthOffset + INT_SIZE;
+  //  private static final long dataOffset = lengthOffset + INT_SIZE;
+  private static final long dataOffset = lengthOffset + LONG_SIZE; // because of alignment
 
   public static MemorySegment allocate(int length) {
     return allocate(null, length);
@@ -30,18 +31,18 @@ public class TemplateArray {
   }
 
   public static void set(MemorySegment address, int index, @Type long value) {
-    //    checkBoundaries(address, index);
+    checkBoundaries(address, index);
     Tpl.put(address, dataOffset + index * Tpl.typeSize(), value);
   }
 
   public static @Type long get(MemorySegment address, int index) {
-    //    checkBoundaries(address, index);
+    checkBoundaries(address, index);
     return Tpl.get(address, dataOffset + index * Tpl.typeSize());
   }
 
-  //  private static void checkBoundaries(long address, int index) {
-  //    if (index < 0 || index >= getLength(address)) throw new IndexOutOfBoundsException();
-  //  }
+  private static void checkBoundaries(MemorySegment address, int index) {
+    if (index < 0 /*|| index >= getLength(address)*/) throw new IndexOutOfBoundsException();
+  }
 
   public static int getLength(MemorySegment address) {
     return address.get(ValueLayout.JAVA_INT, 0);
@@ -57,6 +58,11 @@ public class TemplateArray {
 
   public static void arraycopy(
       MemorySegment src, int srcPos, MemorySegment dest, int destPos, int length) {
-    MemorySegment.copy(src, srcPos, dest, destPos, length);
+    MemorySegment.copy(
+        src,
+        dataOffset + srcPos * Tpl.typeSize(),
+        dest,
+        dataOffset + destPos * Tpl.typeSize(),
+        length * Tpl.typeSize());
   }
 }

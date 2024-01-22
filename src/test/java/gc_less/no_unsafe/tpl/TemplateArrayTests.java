@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.util.Arrays;
 
 public class TemplateArrayTests {
   @Test
@@ -62,6 +64,8 @@ public class TemplateArrayTests {
 
       // WHEN
       TemplateArray.arraycopy(array1, 0, array2, 10, 10);
+
+//      System.out.println(Arrays.toString(array2.toArray(ValueLayout.JAVA_LONG)));
 
       // THEN
       assertEquals(0, TemplateArray.get(array2, 0));
