@@ -31,3 +31,6 @@ mvn compile exec:java -Dexec.mainClass="gc_less.no_unsafe.Main1"
 
 @goal new2
 mvn compile exec:java -Dexec.mainClass="gc_less.no_unsafe.Main2"
+
+@goal new3
+mvn compile exec:java -Dexec.mainClass="gc_less.no_unsafe.Main3"
