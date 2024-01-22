@@ -1,7 +1,6 @@
 package gc_less.no_unsafe.tpl;
 
 import static gc_less.TypeSizes.LONG_SIZE;
-// import static gc_less.Unsafer.getUnsafe;
 
 import gc_less.no_unsafe.NativeMem;
 import gc_less.tpl.Type;
@@ -25,7 +24,7 @@ public class TemplateArray {
     addr.fill((byte) 0);
     setLength(addr, length);
     if (arena != null) {
-      addr = addr.reinterpret(arena, NativeMem::free);
+      addr = addr.reinterpret(arena, TemplateArray::free);
     }
     return addr;
   }
