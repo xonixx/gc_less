@@ -34,8 +34,8 @@ public class NativeMem {
   public static MemorySegment realloc(MemorySegment pointer, long bytes) {
     MemorySegment pointer1;
     try {
-      // Invoke malloc(), which returns a pointer
-      // The size of the memory segment created by malloc() is zero bytes!
+      // returns a pointer
+      // The size of the memory segment is zero bytes!
       pointer1 = (MemorySegment) realloc.invokeExact(pointer, bytes);
     } catch (Throwable e) {
       throw new RuntimeException(e);
