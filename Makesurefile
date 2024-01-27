@@ -27,10 +27,10 @@
     -cp target/classes gc_less.Main4
 
 @goal new1
-mvn compile exec:java -Dexec.mainClass="gc_less.no_unsafe.Main1"
+  mvn compile exec:java -Dexec.mainClass="gc_less.no_unsafe.Main1"
 
 @goal new2
-mvn compile exec:java -Dexec.mainClass="gc_less.no_unsafe.Main2"
+  mvn compile exec:java -Dexec.mainClass="gc_less.no_unsafe.Main2"
 
 @goal new3
-mvn compile exec:java -Dexec.mainClass="gc_less.no_unsafe.Main3"
+  mvn compile exec:java -Dexec.mainClass="gc_less.no_unsafe.Main3"

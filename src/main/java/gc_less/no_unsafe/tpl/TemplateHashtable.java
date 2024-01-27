@@ -39,7 +39,7 @@ public class TemplateHashtable {
       if (bucketNode != 0) {
         sb.append("  ").append(bucketIdx).append("->");
         for (long node = bucketNode; 0 != node; node = Node.getNext(node)) {
-          sb.append(Node.toString(node)).append("->");
+          sb.append(Node.toString(Node.of(node))).append("->");
         }
         sb.setLength(sb.length() - 2);
         sb.append("\n");
