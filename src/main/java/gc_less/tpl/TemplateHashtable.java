@@ -100,7 +100,7 @@ public class TemplateHashtable {
     }
   }
 
-  public static long allocate(Allocator allocator/* TODO */, int initialCapacity, float loadFactor) {
+  public static long allocate(Allocator allocator, int initialCapacity, float loadFactor) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long bytes = bucketsOffset + initialCapacity * LONG_SIZE;
     long addr = Unsafer.allocateMem(bytes);
@@ -108,7 +108,11 @@ public class TemplateHashtable {
     setSize(addr, 0);
     setLoadFactor(addr, loadFactor);
     setCapacity(addr, initialCapacity);
-    setRef(addr, Ref.create(addr));
+    long ref = Ref.create(addr);
+    setRef(addr, ref);
+    if (allocator != null) {
+      allocator.registerForCleanup(ref);
+    }
     return addr;
   }
 
@@ -245,6 +249,7 @@ public class TemplateHashtable {
   }
 
   public static void clear(long address) {
+    System.out.println("CLEAR...");
     int capacity = getCapacity(address);
     for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
       long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
