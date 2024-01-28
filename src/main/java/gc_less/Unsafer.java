@@ -1,8 +1,10 @@
 package gc_less;
 
-import sun.misc.Unsafe;
-
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import sun.misc.Unsafe;
 
 public class Unsafer {
   private static final Unsafe unsafe = prepareUnsafe();
@@ -27,5 +29,30 @@ public class Unsafer {
 
   public static void freeMem(long pointer) {
     unsafe.freeMemory(pointer);
+  }
+
+  private static final Map<Long, Exception> allocationTracking = new HashMap<>();
+
+  public static void resetAllocationTracking() {
+    allocationTracking.clear();
+  }
+
+  public static long allocateMemTrack(long bytes) {
+    long pointer = allocateMem(bytes);
+    allocationTracking.put(pointer, new Exception());
+    return pointer;
+  }
+
+  public static void freeMemTrack(long pointer) {
+    allocationTracking.remove(pointer);
+    freeMem(pointer);
+  }
+
+  public static boolean isMemoryLeak() {
+    return !allocationTracking.isEmpty();
+  }
+
+  public static Collection<Exception> getLeaks() {
+    return allocationTracking.values();
   }
 }
