@@ -29,12 +29,12 @@ public class Allocator implements AutoCloseable {
       long addr = Ref.get(ref);
 
       System.out.println("Freeing local addr " + addr + "...");
-      getUnsafe().freeMemory(addr);
+      Unsafer.freeMem(addr);
 
       System.out.println("Freeing local ref  " + ref + "...");
       Ref.free(ref);
     }
     System.out.println("Freeing locals     " + locals + "...");
-    getUnsafe().freeMemory(locals);
+    Unsafer.freeMem(locals);
   }
 }

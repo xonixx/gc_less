@@ -2,6 +2,7 @@ package gc_less.tpl;
 
 import gc_less.Allocator;
 import gc_less.Ref;
+import gc_less.Unsafer;
 
 import static gc_less.TypeSizes.*;
 import static gc_less.Unsafer.getUnsafe;
@@ -53,13 +54,13 @@ public class TemplateHashtable {
     private static final long totalMemToAllocate = nextOffset + LONG_SIZE;
 
     static long allocate() {
-      long addr = getUnsafe().allocateMemory(totalMemToAllocate);
+      long addr = Unsafer.allocateMem(totalMemToAllocate);
       getUnsafe().setMemory(addr, totalMemToAllocate, (byte) 0);
       return addr;
     }
 
     static void free(long address) {
-      getUnsafe().freeMemory(address);
+      Unsafer.freeMem(address);
     }
 
     static int getHash(long address) {
@@ -102,7 +103,7 @@ public class TemplateHashtable {
   public static long allocate(Allocator allocator/* TODO */, int initialCapacity, float loadFactor) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long bytes = bucketsOffset + initialCapacity * LONG_SIZE;
-    long addr = getUnsafe().allocateMemory(bytes);
+    long addr = Unsafer.allocateMem(bytes);
     getUnsafe().setMemory(addr, bytes, (byte) 0);
     setSize(addr, 0);
     setLoadFactor(addr, loadFactor);
@@ -316,6 +317,6 @@ public class TemplateHashtable {
 
   public static void free(long address) {
     clear(address); // TODO is this enough?
-    getUnsafe().freeMemory(address);
+    Unsafer.freeMem(address);
   }
 }

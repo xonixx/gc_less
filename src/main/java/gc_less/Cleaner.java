@@ -28,9 +28,9 @@ public class Cleaner implements AutoCloseable {
     while (LongStack.getLength(locals) > 0) {
       long addr = LongStack.pop(locals);
       System.out.println("Freeing local  " + addr + "...");
-      getUnsafe().freeMemory(addr);
+      Unsafer.freeMem(addr);
     }
     System.out.println("Freeing locals " + locals + "...");
-    getUnsafe().freeMemory(locals);
+    Unsafer.freeMem(locals);
   }
 }

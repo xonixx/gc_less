@@ -8,7 +8,7 @@ public class Ref {
   }
 
   public static long create(long target) {
-    long ref = getUnsafe().allocateMemory(TypeSizes.LONG_SIZE);
+    long ref = Unsafer.allocateMem(TypeSizes.LONG_SIZE);
     set(ref, target);
     return ref;
   }
@@ -22,6 +22,6 @@ public class Ref {
   }
 
   public static void free(long ref) {
-    getUnsafe().freeMemory(ref);
+    Unsafer.freeMem(ref);
   }
 }

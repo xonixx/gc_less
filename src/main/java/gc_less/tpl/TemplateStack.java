@@ -2,6 +2,7 @@ package gc_less.tpl;
 
 import gc_less.Allocator;
 import gc_less.Ref;
+import gc_less.Unsafer;
 
 import static gc_less.TypeSizes.INT_SIZE;
 import static gc_less.TypeSizes.LONG_SIZE;
@@ -19,7 +20,7 @@ public class TemplateStack {
 
   public static long allocate(Allocator allocator, int initialCapacity) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
-    long addr = getUnsafe().allocateMemory(dataOffset + initialCapacity * Tpl.typeSize());
+    long addr = Unsafer.allocateMem(dataOffset + initialCapacity * Tpl.typeSize());
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
     long ref = Ref.create(addr);
@@ -60,7 +61,7 @@ public class TemplateStack {
   }
 
   public static void free(long address) {
-    getUnsafe().freeMemory(address);
+    Unsafer.freeMem(address);
   }
 
   public static int getLength(long address) {

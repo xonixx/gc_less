@@ -20,4 +20,12 @@ public class Unsafer {
   public static Unsafe getUnsafe() {
     return unsafe;
   }
+
+  public static long allocateMem(long bytes) {
+    return unsafe.allocateMemory(bytes);
+  }
+
+  public static void freeMem(long pointer) {
+    unsafe.freeMemory(pointer);
+  }
 }

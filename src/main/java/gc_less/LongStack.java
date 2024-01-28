@@ -16,7 +16,7 @@ public class LongStack {
 
   public static long allocate(Allocator allocator, int initialCapacity) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
-    long addr = getUnsafe().allocateMemory(dataOffset + initialCapacity * LONG_SIZE);
+    long addr = Unsafer.allocateMem(dataOffset + initialCapacity * LONG_SIZE);
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
     long ref = Ref.create(addr);
@@ -57,7 +57,7 @@ public class LongStack {
   }
 
   public static void free(long address) {
-    getUnsafe().freeMemory(address);
+    Unsafer.freeMem(address);
   }
 
   public static int getLength(long address) {

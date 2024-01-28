@@ -2,6 +2,7 @@ package gc_less.tpl;
 
 import gc_less.Allocator;
 import gc_less.Ref;
+import gc_less.Unsafer;
 
 import static gc_less.TypeSizes.INT_SIZE;
 import static gc_less.Unsafer.getUnsafe;
@@ -17,7 +18,7 @@ public class TemplateArray {
 
   public static long allocate(Allocator allocator, int length) {
     long bytes = dataOffset + length * Tpl.typeSize();
-    long addr = getUnsafe().allocateMemory(bytes);
+    long addr = Unsafer.allocateMem(bytes);
     getUnsafe().setMemory(addr, bytes, (byte) 0);
     setLength(addr, length);
     if (allocator != null) {
@@ -49,7 +50,7 @@ public class TemplateArray {
   }
 
   public static void free(long address) {
-    getUnsafe().freeMemory(address);
+    Unsafer.freeMem(address);
   }
 
   public static void arraycopy(long src, int srcPos, long dest, int destPos, int length) {
