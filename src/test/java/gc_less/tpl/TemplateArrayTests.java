@@ -21,11 +21,15 @@ public class TemplateArrayTests extends MemoryTrackingAssertNoLeaks {
   @Test
   public void testLegalAccess() {
     try (Allocator allocator = new Allocator()) {
-
+      // GIVEN
       long array = TemplateArray.allocate(allocator, 10);
+
+      // WHEN
       TemplateArray.set(array, 0, 111);
       TemplateArray.set(array, 7, 222);
       TemplateArray.set(array, 9, 333);
+
+      // THEN
       assertEquals(111, TemplateArray.get(array, 0));
       assertEquals(222, TemplateArray.get(array, 7));
       assertEquals(333, TemplateArray.get(array, 9));
