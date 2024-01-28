@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class IntArrayTests {
+public class IntArrayTests extends MemoryTrackingAssertNoLeaks {
   @Test
   public void testCreate() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       long array = IntArray.allocate(allocator,10);
       assertEquals(10, IntArray.getLength(array));
       assertEquals(0, IntArray.get(array, 0));
@@ -18,7 +18,7 @@ public class IntArrayTests {
 
   @Test
   public void testLegalAccess() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       long array = IntArray.allocate(allocator,10);
       IntArray.set(array, 0, 111);
       IntArray.set(array, 7, 222);
@@ -31,7 +31,7 @@ public class IntArrayTests {
 
   @Test
   public void testIllegalAccess() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       long array = IntArray.allocate(allocator,10);
 
       for (int illegalIndex : new int[] {-1, 10}) {
@@ -50,7 +50,7 @@ public class IntArrayTests {
 
   @Test
   public void testArraycopy() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       // GIVEN
       long array1 = IntArray.allocate(allocator,10);
       long array2 = IntArray.allocate(allocator,20);

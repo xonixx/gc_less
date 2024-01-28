@@ -1,28 +1,32 @@
 package gc_less.tpl;
 
-import gc_less.Allocator;
-import gc_less.Ref;
-
 import static gc_less.TypeSizes.INT_SIZE;
 import static gc_less.TypeSizes.LONG_SIZE;
 import static gc_less.Unsafer.getUnsafe;
 
+import gc_less.Allocator;
+import gc_less.Ref;
+import gc_less.TypeMeta;
+import gc_less.Unsafer;
+
 public class TemplateStack {
+  public static final int typeId = TypeMeta.nextTypeId();
   private static final long lengthOffset = 0;
   private static final long refOffset = lengthOffset + INT_SIZE;
   private static final long capOffset = refOffset + LONG_SIZE;
   private static final long dataOffset = capOffset + INT_SIZE;
 
+  /** Must be freed via {@link #free} */
   public static long allocate(int initialCapacity) {
     return allocate(null, initialCapacity);
   }
 
   public static long allocate(Allocator allocator, int initialCapacity) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
-    long addr = getUnsafe().allocateMemory(dataOffset + initialCapacity * Tpl.typeSize());
+    long addr = Unsafer.allocateMem(dataOffset + initialCapacity * Tpl.typeSize());
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
-    long ref = Ref.create(addr);
+    long ref = Ref.create(addr, typeId);
     setRef(addr, ref);
     if (allocator != null) {
       allocator.registerForCleanup(ref);
@@ -42,7 +46,7 @@ public class TemplateStack {
     int capacity = getCapacity(addr);
     if (capacity == len) {
       setCapacity(addr, capacity = 2 * capacity);
-      long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * Tpl.typeSize());
+      long newAddr = Unsafer.reallocateMem(addr, dataOffset + capacity * Tpl.typeSize());
       Ref.set(getRef(newAddr), newAddr);
       return newAddr;
     }
@@ -60,7 +64,7 @@ public class TemplateStack {
   }
 
   public static void free(long address) {
-    getUnsafe().freeMemory(address);
+    Unsafer.freeMem(address);
   }
 
   public static int getLength(long address) {

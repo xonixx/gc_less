@@ -6,6 +6,8 @@ import static gc_less.Unsafer.getUnsafe;
 
 /** Non-resizable array (similar to arrays in Java) */
 public class DoubleArray {
+
+  public static final int typeId = TypeMeta.nextTypeId();
   private static final long lengthOffset = 0;
   private static final long dataOffset = lengthOffset + INT_SIZE;
 
@@ -15,11 +17,11 @@ public class DoubleArray {
 
   public static long allocate(Allocator allocator, int length) {
     long bytes = dataOffset + length * DOUBLE_SIZE;
-    long addr = getUnsafe().allocateMemory(bytes);
+    long addr = Unsafer.allocateMem(bytes);
     getUnsafe().setMemory(addr, bytes, (byte) 0);
     setLength(addr, length);
     if (allocator != null) {
-      allocator.registerForCleanup(Ref.create(addr));
+      allocator.registerForCleanup(Ref.create(addr, typeId));
     }
     return addr;
   }
@@ -47,7 +49,7 @@ public class DoubleArray {
   }
 
   public static void free(long address) {
-    getUnsafe().freeMemory(address);
+    Unsafer.freeMem(address);
   }
 
   public static void arraycopy(long src, int srcPos, long dest, int destPos, int length) {

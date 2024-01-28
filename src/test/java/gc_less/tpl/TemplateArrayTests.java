@@ -1,14 +1,15 @@
 package gc_less.tpl;
 
 import gc_less.Allocator;
+import gc_less.MemoryTrackingAssertNoLeaks;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TemplateArrayTests {
+public class TemplateArrayTests extends MemoryTrackingAssertNoLeaks {
   @Test
   public void testCreate() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       long array = TemplateArray.allocate(allocator, 10);
       assertEquals(10, TemplateArray.getLength(array));
       assertEquals(0, TemplateArray.get(array, 0));
@@ -19,7 +20,7 @@ public class TemplateArrayTests {
 
   @Test
   public void testLegalAccess() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
 
       long array = TemplateArray.allocate(allocator, 10);
       TemplateArray.set(array, 0, 111);
@@ -33,7 +34,7 @@ public class TemplateArrayTests {
 
   @Test
   public void testIllegalAccess() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       long array = TemplateArray.allocate(allocator, 10);
 
       assertThrows(
@@ -51,7 +52,7 @@ public class TemplateArrayTests {
 
   @Test
   public void testArraycopy() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       // GIVEN
       long array1 = TemplateArray.allocate(allocator, 10);
       long array2 = TemplateArray.allocate(allocator, 20);
