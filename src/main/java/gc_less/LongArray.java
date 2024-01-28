@@ -6,6 +6,8 @@ import static gc_less.Unsafer.getUnsafe;
 
 /** Non-resizable array (similar to arrays in Java) */
 public class LongArray {
+
+  public static final int typeId = TypeMeta.nextTypeId();
   private static final long lengthOffset = 0;
   private static final long dataOffset = lengthOffset + INT_SIZE;
 

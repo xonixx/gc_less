@@ -2,6 +2,7 @@ package gc_less.tpl;
 
 import gc_less.Allocator;
 import gc_less.Ref;
+import gc_less.TypeMeta;
 import gc_less.Unsafer;
 
 import static gc_less.TypeSizes.INT_SIZE;
@@ -9,6 +10,8 @@ import static gc_less.Unsafer.getUnsafe;
 
 /** Non-resizable array (similar to arrays in Java) */
 public class TemplateArray {
+
+  public static final int typeId = TypeMeta.nextTypeId();
   private static final long lengthOffset = 0;
   private static final long dataOffset = lengthOffset + INT_SIZE;
 

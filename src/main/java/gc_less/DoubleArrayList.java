@@ -6,6 +6,7 @@ import static gc_less.Unsafer.getUnsafe;
 
 /** Resizable array (similar to ArrayList in Java) */
 public class DoubleArrayList {
+  public static final int typeId = TypeMeta.nextTypeId();
   private static final long lengthOffset = 0;
   private static final long refOffset = lengthOffset + INT_SIZE;
   private static final long capOffset = refOffset + LONG_SIZE;

@@ -5,6 +5,7 @@ import static gc_less.Unsafer.getUnsafe;
 
 
 public class DoubleStack {
+  public static final int typeId = TypeMeta.nextTypeId();
   private static final long lengthOffset = 0;
   private static final long refOffset = lengthOffset + INT_SIZE;
   private static final long capOffset = refOffset + LONG_SIZE;
