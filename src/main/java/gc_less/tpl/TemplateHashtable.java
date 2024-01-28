@@ -109,9 +109,9 @@ public class TemplateHashtable {
     setSize(addr, 0);
     setLoadFactor(addr, loadFactor);
     setCapacity(addr, initialCapacity);
-    long ref = Ref.create(addr, typeId);
-    setRef(addr, ref);
     if (allocator != null) {
+      long ref = Ref.create(addr, typeId);
+      setRef(addr, ref);
       allocator.registerForCleanup(ref);
     }
     return addr;
@@ -170,7 +170,9 @@ public class TemplateHashtable {
 
     int newCapacity = capacity * 2;
     long newAddress = TemplateHashtable.allocate(null, newCapacity, loadFactor);
-    Ref.set(getRef(newAddress), newAddress);
+    long ref = getRef(address);
+    setRef(newAddress, ref);
+    Ref.set(ref, newAddress);
 
     for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
       long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
@@ -250,14 +252,15 @@ public class TemplateHashtable {
   }
 
   public static void clear(long address) {
-    System.out.println("CLEAR...");
     int capacity = getCapacity(address);
     for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
       long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketNode = getUnsafe().getLong(bucketAddr);
 
+      int i=0;
       for (long node = bucketNode; 0 != node; ) {
         long next = Node.getNext(node);
+        System.out.println(i++);
         Node.free(node);
         node = next;
       }

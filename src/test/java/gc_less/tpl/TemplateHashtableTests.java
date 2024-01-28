@@ -91,7 +91,7 @@ public class TemplateHashtableTests extends MemoryTrackingAssertNoLeaks {
   private long put(long hashTable, long key, long val) {
     long newAddr = TemplateHashtable.put(hashTable, key, val);
     if (newAddr != hashTable) {
-      System.out.println("Reallocation occurred.");
+      System.out.printf("Reallocation occurred: %s -> %s\n", hashTable, newAddr);
     }
     return newAddr;
   }
