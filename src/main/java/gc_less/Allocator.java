@@ -5,8 +5,8 @@ public class Allocator implements AutoCloseable {
   private final long stack;
 
   public Allocator() {
-    stack = LongStack.allocate(null, 10);
-    long locals = LongStack.allocate(null, 10);
+    stack = LongStack.allocate(10);
+    long locals = LongStack.allocate(10);
     LongStack.push(stack, locals);
   }
 
@@ -24,7 +24,7 @@ public class Allocator implements AutoCloseable {
       long addr = Ref.get(ref);
 
       System.out.println("Freeing local addr " + addr + "...");
-      TypeMeta.free(addr,Ref.getTypeId(ref));
+      TypeMeta.free(addr, Ref.getTypeId(ref));
 
       System.out.println("Freeing local ref  " + ref + "...");
       Ref.free(ref);

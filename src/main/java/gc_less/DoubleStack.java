@@ -11,6 +11,11 @@ public class DoubleStack {
   private static final long capOffset = refOffset + LONG_SIZE;
   private static final long dataOffset = capOffset + INT_SIZE;
 
+  /** Must be freed via {@link #free} */
+  public static long allocate(int initialCapacity) {
+    return allocate(null, initialCapacity);
+  }
+
   public static long allocate(Allocator allocator, int initialCapacity) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long addr = Unsafer.allocateMem(dataOffset + initialCapacity * DOUBLE_SIZE);

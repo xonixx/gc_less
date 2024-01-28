@@ -16,14 +16,19 @@ public class TemplateStack {
   private static final long capOffset = refOffset + LONG_SIZE;
   private static final long dataOffset = capOffset + INT_SIZE;
 
+  /** Must be freed via {@link #free} */
+  public static long allocate(int initialCapacity) {
+    return allocate(null, initialCapacity);
+  }
+
   public static long allocate(Allocator allocator, int initialCapacity) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long addr = Unsafer.allocateMem(dataOffset + initialCapacity * Tpl.typeSize());
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
+    long ref = Ref.create(addr, typeId);
+    setRef(addr, ref);
     if (allocator != null) {
-      long ref = Ref.create(addr, typeId);
-      setRef(addr, ref);
       allocator.registerForCleanup(ref);
     }
     return addr;
