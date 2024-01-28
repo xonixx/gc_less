@@ -1,11 +1,12 @@
 package gc_less.tpl;
 
 import gc_less.Allocator;
+import gc_less.MemoryTrackingAssertNoLeaks;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TemplateArrayListTests {
+public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
   @Test
   public void testCreate() {
     try (Allocator allocator = Allocator.newFrame()) {

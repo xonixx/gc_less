@@ -1,6 +1,7 @@
 package gc_less.tpl;
 
 import gc_less.Allocator;
+import gc_less.MemoryTrackingAssertNoLeaks;
 import gc_less.Ref;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TemplateStackTests {
+public class TemplateStackTests extends MemoryTrackingAssertNoLeaks {
   @Test
   public void test1() {
     try (Allocator allocator = Allocator.newFrame()) {

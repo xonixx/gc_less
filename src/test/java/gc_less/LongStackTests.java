@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LongStackTests {
+public class LongStackTests extends MemoryTrackingAssertNoLeaks {
   @Test
   public void test1() {
     try (Allocator allocator = Allocator.newFrame()) {

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class IntArrayTests {
+public class IntArrayTests extends MemoryTrackingAssertNoLeaks {
   @Test
   public void testCreate() {
     try (Allocator allocator = Allocator.newFrame()) {
