@@ -13,7 +13,7 @@ function genTypeMeta(   i,outFile,cls) {
   printf "" > outFile
   while (getline < (TPL_FOLDER "/TypeMeta.java")) {
     if (/package gc_less.tpl/) {
-      print "package gc_less;" >> outFile
+      print "package gc_less;\nimport gc_less.tpl.*;" >> outFile
     } else if (/FREE_LOGIC/) {
       for (i = 0; i in Classes; i++) {
         printf ("    %sif (typeId==%s.typeId) %s.free(pointer);\n", i > 0 ? "else " : "", cls = Classes[i], cls) >> outFile
@@ -28,16 +28,20 @@ function gen(   cmd,f) {
   }
   close(cmd)
 }
-function processTemplate(tplFolder, tplFileName,   tplFile,type,outFile,line,lcfType,typeSizesDone,className) {
-  tplFile = tplFolder "/" tplFileName
+function className(tplFile,   c) {
+  c = tplFile
+  sub(/\.java/, "", c)
+  sub(/.+\//, "", c)
+  return c
+}
+
+function processTemplate(tplFolder, tplFileName,   tplFile,type,outFile,line,lcfType,typeSizesDone) {
+  Classes[length(Classes)] = className(tplFile = tplFolder "/" tplFileName)
   for (type in GEN) {
     outFile = OUT_FOLDER "/" tplFileName
     sub(/Template/, lcfType = lcFirst(type), outFile)
 
-    className = outFile
-    sub(/\.java/, "", className)
-    sub(/.+\//, "", className)
-    Classes[length(Classes)] = className
+    Classes[length(Classes)] = className(outFile)
 
     print tplFile " -> " outFile "..."
 
