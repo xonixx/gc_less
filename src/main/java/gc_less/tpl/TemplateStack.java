@@ -21,7 +21,7 @@ public class TemplateStack {
     long addr = Unsafer.allocateMem(dataOffset + initialCapacity * Tpl.typeSize());
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
-    long ref = Ref.create(addr);
+    long ref = Ref.create(addr, typeId);
     setRef(addr, ref);
     if (allocator != null) {
       allocator.registerForCleanup(ref);

@@ -4,7 +4,7 @@ public class TypeMeta {
   private static int typeIdCounter = 0;
   public static int nextTypeId() { return ++typeIdCounter; }
 
-  public void free(long pointer, int typeId) {
+  public static void free(long pointer, int typeId) {
     if (typeId==LongArray.typeId) LongArray.free(pointer);
     else if (typeId==DoubleArray.typeId) DoubleArray.free(pointer);
     else if (typeId==IntArray.typeId) IntArray.free(pointer);

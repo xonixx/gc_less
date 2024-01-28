@@ -22,7 +22,7 @@ public class IntArrayList {
     long addr = Unsafer.allocateMem(bytes);
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
-    long ref = Ref.create(addr);
+    long ref = Ref.create(addr, typeId);
     setRef(addr, ref);
     if (allocator != null) {
       allocator.registerForCleanup(ref);

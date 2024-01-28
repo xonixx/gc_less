@@ -25,7 +25,7 @@ public class TemplateArray {
     getUnsafe().setMemory(addr, bytes, (byte) 0);
     setLength(addr, length);
     if (allocator != null) {
-      allocator.registerForCleanup(Ref.create(addr));
+      allocator.registerForCleanup(Ref.create(addr, typeId));
     }
     return addr;
   }
