@@ -67,7 +67,7 @@ public class LongArrayList {
     int capacity = getCapacity(addr);
     if (capacity == len) {
       setCapacity(addr, capacity = 2 * capacity);
-      long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * LONG_SIZE);
+      long newAddr = Unsafer.reallocateMem(addr, dataOffset + capacity * LONG_SIZE);
       Ref.set(getRef(newAddr), newAddr);
       return newAddr;
     }

@@ -39,7 +39,7 @@ public class TemplateStack {
     int capacity = getCapacity(addr);
     if (capacity == len) {
       setCapacity(addr, capacity = 2 * capacity);
-      long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * Tpl.typeSize());
+      long newAddr = Unsafer.reallocateMem(addr, dataOffset + capacity * Tpl.typeSize());
       Ref.set(getRef(newAddr), newAddr);
       return newAddr;
     }

@@ -32,6 +32,15 @@ public class Unsafer {
     return pointer;
   }
 
+  public static long reallocateMem(long pointer, long bytes) {
+    long pointer1 = unsafe.reallocateMemory(pointer, bytes);
+    if (trackMemoryLeaks) {
+      allocationTracking.remove(pointer);
+      allocationTracking.put(pointer1, new Exception());
+    }
+    return pointer1;
+  }
+
   public static void freeMem(long pointer) {
     if (trackMemoryLeaks) {
       allocationTracking.remove(pointer);
