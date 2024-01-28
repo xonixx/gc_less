@@ -259,10 +259,8 @@ public class TemplateHashtable {
       long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketNode = getUnsafe().getLong(bucketAddr);
 
-      int i = 0;
       for (long node = bucketNode; 0 != node; ) {
         long next = Node.getNext(node);
-        System.out.println(i++);
         Node.free(node);
         node = next;
       }

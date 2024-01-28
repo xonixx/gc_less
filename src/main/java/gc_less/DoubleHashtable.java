@@ -1,8 +1,8 @@
 package gc_less;
 
-
 import static gc_less.TypeSizes.*;
 import static gc_less.Unsafer.getUnsafe;
+
 
 public class DoubleHashtable {
   public static final int typeId = TypeMeta.nextTypeId();
@@ -217,7 +217,9 @@ public class DoubleHashtable {
     return false;
   }
 
-  /** @return removed value for key */
+  /**
+   * @return removed value for key
+   */
   public static double remove(long address, double key) {
     int hashCode = Double.hashCode(key);
 
@@ -253,10 +255,8 @@ public class DoubleHashtable {
       long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketNode = getUnsafe().getLong(bucketAddr);
 
-      int i=0;
       for (long node = bucketNode; 0 != node; ) {
         long next = Node.getNext(node);
-        System.out.println(i++);
         Node.free(node);
         node = next;
       }
@@ -266,15 +266,13 @@ public class DoubleHashtable {
   public static long keys(long address, Allocator allocator) {
     long keysArrayAddr = DoubleArray.allocate(allocator, getSize(address));
     int capacity = getCapacity(address);
+    int i = 0;
     for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
       long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketNode = getUnsafe().getLong(bucketAddr);
 
-      int i = 0;
-      for (long node = bucketNode; 0 != node; ) {
-        long next = Node.getNext(node);
-        DoubleArray.set(keysArrayAddr, i++, Node.getValue(node));
-        node = next;
+      for (long node = bucketNode; 0 != node; node = Node.getNext(node)) {
+        DoubleArray.set(keysArrayAddr, i++, Node.getKey(node));
       }
     }
     return keysArrayAddr;
