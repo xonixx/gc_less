@@ -1,18 +1,14 @@
 package gc_less;
 
-
 import static gc_less.TypeSizes.*;
 import static gc_less.Unsafer.getUnsafe;
+
 
 public class LongStack {
   private static final long lengthOffset = 0;
   private static final long refOffset = lengthOffset + INT_SIZE;
   private static final long capOffset = refOffset + LONG_SIZE;
   private static final long dataOffset = capOffset + INT_SIZE;
-
-  public static long allocate(int initialCapacity) {
-    return allocate(null, initialCapacity);
-  }
 
   public static long allocate(Allocator allocator, int initialCapacity) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");

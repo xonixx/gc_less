@@ -1,22 +1,18 @@
 package gc_less.tpl;
 
-import gc_less.Allocator;
-import gc_less.Ref;
-import gc_less.Unsafer;
-
 import static gc_less.TypeSizes.INT_SIZE;
 import static gc_less.TypeSizes.LONG_SIZE;
 import static gc_less.Unsafer.getUnsafe;
+
+import gc_less.Allocator;
+import gc_less.Ref;
+import gc_less.Unsafer;
 
 public class TemplateStack {
   private static final long lengthOffset = 0;
   private static final long refOffset = lengthOffset + INT_SIZE;
   private static final long capOffset = refOffset + LONG_SIZE;
   private static final long dataOffset = capOffset + INT_SIZE;
-
-  public static long allocate(int initialCapacity) {
-    return allocate(null, initialCapacity);
-  }
 
   public static long allocate(Allocator allocator, int initialCapacity) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");

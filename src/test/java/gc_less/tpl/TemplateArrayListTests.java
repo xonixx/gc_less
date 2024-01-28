@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
   @Test
   public void testCreate() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       // WHEN
       long arrayList = TemplateArrayList.allocate(allocator, 10);
 
@@ -21,7 +21,7 @@ public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testLegalAccess() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       // GIVEN
       long arrayList = TemplateArrayList.allocate(allocator, 10);
 
@@ -40,7 +40,7 @@ public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testLegalAccessWithReallocations() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
 
       // GIVEN
       long arrayList = TemplateArrayList.allocate(allocator, 1);
@@ -60,7 +60,7 @@ public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testInsert() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       // GIVEN
       long arrayList = TemplateArrayList.allocate(allocator, 10);
 
@@ -81,7 +81,7 @@ public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testRemove() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       // GIVEN
       long arrayList = TemplateArrayList.allocate(allocator, 10);
       arrayList = insertData(arrayList);
@@ -108,7 +108,7 @@ public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testIllegalAccess() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       // GIVEN
       long arrayList = TemplateArrayList.allocate(allocator, 10);
 
@@ -135,7 +135,7 @@ public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testIllegalAccessInsert() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       // GIVEN
       long arrayList = TemplateArrayList.allocate(allocator, 10);
 

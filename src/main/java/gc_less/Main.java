@@ -1,11 +1,12 @@
 package gc_less;
 
-import static gc_less.Cleaner.locals;
-
 public class Main {
   public static void main(String[] args) {
     long stack, stack1;
-    try (Cleaner ignored = locals().add(stack = IntStack.allocate(2)).add(stack1 = LongStack.allocate(10))) {
+    try (Allocator allocator = new Allocator()) {
+      stack = IntStack.allocate(allocator, 2);
+      stack1 = LongStack.allocate(allocator, 10);
+
       stack = IntStack.push(stack, 1);
       stack = IntStack.push(stack, 2);
       stack = IntStack.push(stack, 3);
@@ -31,7 +32,10 @@ public class Main {
 
   public static void main2() {
     long stack, stack1;
-    try (Cleaner ignored = locals().add(stack = IntStack.allocate(2)).add(stack1 = LongStack.allocate(10))) {
+    try (Allocator allocator = new Allocator()) {
+      stack = IntStack.allocate(allocator, 2);
+      stack1 = LongStack.allocate(allocator, 10);
+      
       stack = IntStack.push(stack, 1);
       stack = IntStack.push(stack, 2);
       stack = IntStack.push(stack, 3);

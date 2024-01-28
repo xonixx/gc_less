@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TemplateStackTests extends MemoryTrackingAssertNoLeaks {
   @Test
   public void test1() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       long stack = TemplateStack.allocate(allocator, 10);
 
       long ref = TemplateStack.getRef(stack);
@@ -40,7 +40,7 @@ public class TemplateStackTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void test2() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
 
       long stack = TemplateStack.allocate(allocator, 2);
 

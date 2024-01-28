@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TemplateHashtableTests extends MemoryTrackingAssertNoLeaks {
   @Test
   public void testCreate() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       // GIVEN
       long hashTable = TemplateHashtable.allocate(allocator, 10, .75f);
       // WHEN
@@ -23,14 +23,14 @@ public class TemplateHashtableTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testGet() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       doTestGet(allocator, 10);
     }
   }
 
   @Test
   public void testRemove() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       // GIVEN
       long hashTable = TemplateHashtable.allocate(allocator, 10, .75f);
       hashTable = fill(hashTable);
@@ -58,7 +58,7 @@ public class TemplateHashtableTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testGetWithReallocations() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       doTestGet(allocator, 1);
     }
   }
