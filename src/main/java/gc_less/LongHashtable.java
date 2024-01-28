@@ -321,7 +321,7 @@ public class LongHashtable {
   }
 
   public static void free(long address) {
-    clear(address); // TODO is this enough?
+    clear(address);
     Unsafer.freeMem(address);
   }
 }
