@@ -8,6 +8,7 @@ import sun.misc.Unsafe;
 
 public class Unsafer {
   private static final Unsafe unsafe = prepareUnsafe();
+  public static boolean trackMemoryLeaks = false;
 
   private static Unsafe prepareUnsafe() {
     try {
@@ -24,10 +25,17 @@ public class Unsafer {
   }
 
   public static long allocateMem(long bytes) {
-    return unsafe.allocateMemory(bytes);
+    long pointer = unsafe.allocateMemory(bytes);
+    if (trackMemoryLeaks) {
+      allocationTracking.put(pointer, new Exception());
+    }
+    return pointer;
   }
 
   public static void freeMem(long pointer) {
+    if (trackMemoryLeaks) {
+      allocationTracking.remove(pointer);
+    }
     unsafe.freeMemory(pointer);
   }
 
@@ -35,17 +43,6 @@ public class Unsafer {
 
   public static void resetAllocationTracking() {
     allocationTracking.clear();
-  }
-
-  public static long allocateMemTrack(long bytes) {
-    long pointer = allocateMem(bytes);
-    allocationTracking.put(pointer, new Exception());
-    return pointer;
-  }
-
-  public static void freeMemTrack(long pointer) {
-    allocationTracking.remove(pointer);
-    freeMem(pointer);
   }
 
   public static boolean isMemoryLeak() {
