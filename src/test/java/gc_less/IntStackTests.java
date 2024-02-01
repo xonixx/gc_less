@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class IntStackTests {
+public class IntStackTests extends MemoryTrackingAssertNoLeaks {
   @Test
   public void test1() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       long stack = IntStack.allocate(allocator, 10);
 
       long ref = IntStack.getRef(stack);
@@ -36,7 +36,7 @@ public class IntStackTests {
 
   @Test
   public void test2() {
-    try (Allocator allocator = Allocator.newFrame()) {
+    try (Allocator allocator = new Allocator()) {
       long stack = IntStack.allocate(allocator, 2);
 
       long ref = IntStack.getRef(stack);

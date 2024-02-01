@@ -1,18 +1,13 @@
 package gc_less;
 
-import static gc_less.Unsafer.getUnsafe;
-
 public class Allocator implements AutoCloseable {
 
-  private static final Allocator instance = new Allocator();
-  private static final long stack = LongStack.allocate(10);
+  private final long stack;
 
-  private Allocator() {}
-
-  public static Allocator newFrame() {
+  public Allocator() {
+    stack = LongStack.allocate(10);
     long locals = LongStack.allocate(10);
     LongStack.push(stack, locals);
-    return instance;
   }
 
   public void registerForCleanup(long ref) {
@@ -29,12 +24,15 @@ public class Allocator implements AutoCloseable {
       long addr = Ref.get(ref);
 
       System.out.println("Freeing local addr " + addr + "...");
-      getUnsafe().freeMemory(addr);
+      TypeMeta.free(addr, Ref.getTypeId(ref));
 
       System.out.println("Freeing local ref  " + ref + "...");
       Ref.free(ref);
     }
     System.out.println("Freeing locals     " + locals + "...");
-    getUnsafe().freeMemory(locals);
+    Ref.free(LongStack.getRef(locals));
+    Unsafer.freeMem(locals);
+    Ref.free(LongStack.getRef(stack));
+    LongStack.free(stack);
   }
 }

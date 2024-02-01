@@ -6,6 +6,7 @@ import static gc_less.Unsafer.getUnsafe;
 
 /** Resizable array (similar to ArrayList in Java) */
 public class LongArrayList {
+  public static final int typeId = TypeMeta.nextTypeId();
   private static final long lengthOffset = 0;
   private static final long refOffset = lengthOffset + INT_SIZE;
   private static final long capOffset = refOffset + LONG_SIZE;
@@ -18,10 +19,10 @@ public class LongArrayList {
   public static long allocate(Allocator allocator, int initialCapacity) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long bytes = dataOffset + initialCapacity * LONG_SIZE;
-    long addr = getUnsafe().allocateMemory(bytes);
+    long addr = Unsafer.allocateMem(bytes);
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
-    long ref = Ref.create(addr);
+    long ref = Ref.create(addr, typeId);
     setRef(addr, ref);
     if (allocator != null) {
       allocator.registerForCleanup(ref);
@@ -30,7 +31,7 @@ public class LongArrayList {
   }
 
   public static void free(long address) {
-    getUnsafe().freeMemory(address);
+    Unsafer.freeMem(address);
   }
 
   public static long add(long addr, long value) {
@@ -67,7 +68,7 @@ public class LongArrayList {
     int capacity = getCapacity(addr);
     if (capacity == len) {
       setCapacity(addr, capacity = 2 * capacity);
-      long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * LONG_SIZE);
+      long newAddr = Unsafer.reallocateMem(addr, dataOffset + capacity * LONG_SIZE);
       Ref.set(getRef(newAddr), newAddr);
       return newAddr;
     }

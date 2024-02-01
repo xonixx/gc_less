@@ -2,12 +2,16 @@ package gc_less.tpl;
 
 import gc_less.Allocator;
 import gc_less.Ref;
+import gc_less.TypeMeta;
+import gc_less.Unsafer;
 
 import static gc_less.TypeSizes.INT_SIZE;
 import static gc_less.Unsafer.getUnsafe;
 
 /** Non-resizable array (similar to arrays in Java) */
 public class TemplateArray {
+
+  public static final int typeId = TypeMeta.nextTypeId();
   private static final long lengthOffset = 0;
   private static final long dataOffset = lengthOffset + INT_SIZE;
 
@@ -17,11 +21,11 @@ public class TemplateArray {
 
   public static long allocate(Allocator allocator, int length) {
     long bytes = dataOffset + length * Tpl.typeSize();
-    long addr = getUnsafe().allocateMemory(bytes);
+    long addr = Unsafer.allocateMem(bytes);
     getUnsafe().setMemory(addr, bytes, (byte) 0);
     setLength(addr, length);
     if (allocator != null) {
-      allocator.registerForCleanup(Ref.create(addr));
+      allocator.registerForCleanup(Ref.create(addr, typeId));
     }
     return addr;
   }
@@ -49,7 +53,7 @@ public class TemplateArray {
   }
 
   public static void free(long address) {
-    getUnsafe().freeMemory(address);
+    Unsafer.freeMem(address);
   }
 
   public static void arraycopy(long src, int srcPos, long dest, int destPos, int length) {

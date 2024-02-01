@@ -1,11 +1,11 @@
 package gc_less;
 
-
 import static gc_less.TypeSizes.*;
 import static gc_less.Unsafer.getUnsafe;
 
-public class LongHashtable {
 
+public class LongHashtable {
+  public static final int typeId = TypeMeta.nextTypeId();
   private static final long sizeOffset = 0;
   private static final long refOffset = sizeOffset + INT_SIZE;
   private static final long capOffset = refOffset + LONG_SIZE;
@@ -51,13 +51,13 @@ public class LongHashtable {
     private static final long totalMemToAllocate = nextOffset + LONG_SIZE;
 
     static long allocate() {
-      long addr = getUnsafe().allocateMemory(totalMemToAllocate);
+      long addr = Unsafer.allocateMem(totalMemToAllocate);
       getUnsafe().setMemory(addr, totalMemToAllocate, (byte) 0);
       return addr;
     }
 
     static void free(long address) {
-      getUnsafe().freeMemory(address);
+      Unsafer.freeMem(address);
     }
 
     static int getHash(long address) {
@@ -97,15 +97,19 @@ public class LongHashtable {
     }
   }
 
-  public static long allocate(Allocator allocator/* TODO */, int initialCapacity, float loadFactor) {
+  public static long allocate(Allocator allocator, int initialCapacity, float loadFactor) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long bytes = bucketsOffset + initialCapacity * LONG_SIZE;
-    long addr = getUnsafe().allocateMemory(bytes);
+    long addr = Unsafer.allocateMem(bytes);
     getUnsafe().setMemory(addr, bytes, (byte) 0);
     setSize(addr, 0);
     setLoadFactor(addr, loadFactor);
     setCapacity(addr, initialCapacity);
-    setRef(addr, Ref.create(addr));
+    if (allocator != null) {
+      long ref = Ref.create(addr, typeId);
+      setRef(addr, ref);
+      allocator.registerForCleanup(ref);
+    }
     return addr;
   }
 
@@ -162,7 +166,9 @@ public class LongHashtable {
 
     int newCapacity = capacity * 2;
     long newAddress = LongHashtable.allocate(null, newCapacity, loadFactor);
-    Ref.set(getRef(newAddress), newAddress);
+    long ref = getRef(address);
+    setRef(newAddress, ref);
+    Ref.set(ref, newAddress);
 
     for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
       long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
@@ -211,7 +217,9 @@ public class LongHashtable {
     return false;
   }
 
-  /** @return removed value for key */
+  /**
+   * @return removed value for key
+   */
   public static long remove(long address, long key) {
     int hashCode = Long.hashCode(key);
 
@@ -258,15 +266,13 @@ public class LongHashtable {
   public static long keys(long address, Allocator allocator) {
     long keysArrayAddr = LongArray.allocate(allocator, getSize(address));
     int capacity = getCapacity(address);
+    int i = 0;
     for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
       long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketNode = getUnsafe().getLong(bucketAddr);
 
-      int i = 0;
-      for (long node = bucketNode; 0 != node; ) {
-        long next = Node.getNext(node);
-        LongArray.set(keysArrayAddr, i++, Node.getValue(node));
-        node = next;
+      for (long node = bucketNode; 0 != node; node = Node.getNext(node)) {
+        LongArray.set(keysArrayAddr, i++, Node.getKey(node));
       }
     }
     return keysArrayAddr;
@@ -313,7 +319,7 @@ public class LongHashtable {
   }
 
   public static void free(long address) {
-    clear(address); // TODO is this enough?
-    getUnsafe().freeMemory(address);
+    clear(address);
+    Unsafer.freeMem(address);
   }
 }

@@ -2,6 +2,7 @@ package gc_less.tpl;
 
 import gc_less.Allocator;
 import gc_less.Ref;
+import gc_less.TypeMeta;
 import gc_less.Unsafer;
 
 import static gc_less.TypeSizes.INT_SIZE;
@@ -10,6 +11,7 @@ import static gc_less.Unsafer.getUnsafe;
 
 /** Resizable array (similar to ArrayList in Java) */
 public class TemplateArrayList {
+  public static final int typeId = TypeMeta.nextTypeId();
   private static final long lengthOffset = 0;
   private static final long refOffset = lengthOffset + INT_SIZE;
   private static final long capOffset = refOffset + LONG_SIZE;
@@ -22,10 +24,10 @@ public class TemplateArrayList {
   public static long allocate(Allocator allocator, int initialCapacity) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long bytes = dataOffset + initialCapacity * Tpl.typeSize();
-    long addr = getUnsafe().allocateMemory(bytes);
+    long addr = Unsafer.allocateMem(bytes);
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
-    long ref = Ref.create(addr);
+    long ref = Ref.create(addr, typeId);
     setRef(addr, ref);
     if (allocator != null) {
       allocator.registerForCleanup(ref);
@@ -34,7 +36,7 @@ public class TemplateArrayList {
   }
 
   public static void free(long address) {
-    getUnsafe().freeMemory(address);
+    Unsafer.freeMem(address);
   }
 
   public static long add(long addr, @Type long value) {
@@ -71,7 +73,7 @@ public class TemplateArrayList {
     int capacity = getCapacity(addr);
     if (capacity == len) {
       setCapacity(addr, capacity = 2 * capacity);
-      long newAddr = getUnsafe().reallocateMemory(addr, dataOffset + capacity * Tpl.typeSize());
+      long newAddr = Unsafer.reallocateMem(addr, dataOffset + capacity * Tpl.typeSize());
       Ref.set(getRef(newAddr), newAddr);
       return newAddr;
     }

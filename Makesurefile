@@ -1,12 +1,16 @@
 # vim: syntax=bash
 
-@define JAVA_BIN "$HOME/.sdkman/candidates/java/23.ea.3-open/bin"
-@define JAVA     "$JAVA_BIN/java"
-@define JAVAC    "$JAVA_BIN/javac"
+@define JAVA_HOME "$HOME/.sdkman/candidates/java/23.ea.3-open"
+@define JAVA_BIN  "$JAVA_HOME/bin"
+@define JAVA      "$JAVA_BIN/java"
+@define JAVAC     "$JAVA_BIN/javac"
 
 @goal gen
 @doc 'Generate implementations by templates'
   awk -f gen.awk
+
+@goal test
+  mvn test
 
 @goal java_version
   $JAVA -version
