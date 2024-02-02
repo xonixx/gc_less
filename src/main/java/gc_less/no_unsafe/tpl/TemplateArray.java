@@ -12,7 +12,7 @@ import java.lang.foreign.ValueLayout;
 public class TemplateArray {
   private static final long lengthOffset = 0;
   //  private static final long dataOffset = lengthOffset + INT_SIZE;
-  private static final long dataOffset = lengthOffset + LONG_SIZE; // because of alignment
+  private static final long dataOffset = lengthOffset + LONG_SIZE; // because of alignment TODO check _UNALIGNED
 
   public static MemorySegment allocate(int length) {
     return allocate(null, length);

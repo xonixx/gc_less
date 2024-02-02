@@ -7,6 +7,7 @@ import gc_less.Ref;
 import gc_less.no_unsafe.NativeMem;
 import gc_less.tpl.Type;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
@@ -113,7 +114,7 @@ public class TemplateHashtable {
     }
   }
 
-  public static long allocate(
+  public static MemorySegment allocate(
       Allocator allocator /* TODO */, int initialCapacity, float loadFactor) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long bytes = bucketsOffset + initialCapacity * LONG_SIZE;
@@ -139,13 +140,13 @@ public class TemplateHashtable {
     long bucketNode = address.get(ValueLayout.JAVA_LONG, bucketOffset);
 
     if (bucketNode == 0) { // empty bucket
-      long node = Node.allocate();
+      MemorySegment node = Node.allocate();
       Node.setKey(node, key);
       Node.setHash(node, hashCode);
       Node.setValue(node, value);
       Node.setNext(node, 0);
       //      getUnsafe().putLong(bucketAddr, node);
-      address.set(ValueLayout.JAVA_LONG, bucketOffset, node);
+      address.set(ValueLayout.ADDRESS_UNALIGNED, bucketOffset, node);
       changeSize(address, 1);
     } else {
       boolean found = false;
@@ -161,13 +162,13 @@ public class TemplateHashtable {
       }
       if (!found) {
         // insert
-        long node = Node.allocate();
+        MemorySegment node = Node.allocate();
         Node.setKey(node, key);
         Node.setHash(node, hashCode);
         Node.setValue(node, value);
         Node.setNext(node, bucketNode);
         //        getUnsafe().putLong(bucketAddr, node);
-        address.set(ValueLayout.JAVA_LONG, bucketOffset, node);
+        address.set(ValueLayout.ADDRESS_UNALIGNED, bucketOffset, node);
         changeSize(address, 1);
       }
     }
@@ -182,7 +183,7 @@ public class TemplateHashtable {
     }
 
     int newCapacity = capacity * 2;
-    long newAddress = TemplateHashtable.allocate(null, newCapacity, loadFactor);
+    MemorySegment newAddress = TemplateHashtable.allocate(null, newCapacity, loadFactor);
     Ref.set(getRef(newAddress), newAddress);
 
     for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
@@ -289,8 +290,8 @@ public class TemplateHashtable {
     }
   }
 
-  public static long keys(MemorySegment address, Allocator allocator) {
-    long keysArrayAddr = TemplateArray.allocate(allocator, getSize(address));
+  public static MemorySegment keys(MemorySegment address, Arena arena) {
+    MemorySegment keysArrayAddr = TemplateArray.allocate(arena, getSize(address));
     int capacity = getCapacity(address);
     for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
       //    long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
