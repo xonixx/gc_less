@@ -1,5 +1,7 @@
 package gc_less.python_like;
 
+import java.util.Arrays;
+
 public class IntHashtable {
   private int[] storage;
 
@@ -110,6 +112,11 @@ public class IntHashtable {
     }
 
     return 0; // absent
+  }
+
+  void clear() {
+    size = 0;
+    Arrays.fill(storage, 0);
   }
 
   public int size() {

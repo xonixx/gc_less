@@ -19,11 +19,27 @@ public class IntHashtableTests {
     assertEquals(111, h.get(111));
     assertEquals(22222, h.get(222));
     assertEquals(777, h.get(777));
-    
+
     assertEquals(111, h.remove(111));
-    assertEquals(0, h.get(111));
     assertEquals(2, h.size());
+    assertEquals(0, h.get(111));
+    assertEquals(22222, h.get(222));
+    assertEquals(777, h.get(777));
 
+    h.clear();
+    assertEquals(0, h.size());
+    assertEquals(0, h.get(111));
+    assertEquals(0, h.get(222));
+    assertEquals(0, h.get(777));
 
+    for (int k = 1; k <= 100; k++) {
+      assertEquals(0, h.put(k, k * 7));
+    }
+
+    assertEquals(100, h.size());
+
+    for (int k = 1; k <= 100; k++) {
+      assertEquals(k * 7, h.get(k));
+    }
   }
 }
