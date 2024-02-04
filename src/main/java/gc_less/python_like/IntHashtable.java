@@ -82,12 +82,12 @@ public class IntHashtable {
   private void resizeIfNeeded() {
     if (size > sizeMaxLoad) {
       int oldCapacity = capacity;
-      capacity = (int) (capacity * 1.5);
+      capacity *= 2;
       System.out.println("resizing " + oldCapacity + " -> " + capacity + "...");
       sizeMaxLoad = capacity * loadFactor;
 
       int[] oldStorage = storage;
-      storage = new int[capacity];
+      storage = new int[capacity * 2];
 
       for (int i = 0; i < oldCapacity; i += 2) {
         int key = oldStorage[i];
