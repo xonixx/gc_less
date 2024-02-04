@@ -81,18 +81,18 @@ public class IntHashtable {
 
   private void resizeIfNeeded() {
     if (size > sizeMaxLoad) {
-      int oldCapacity = capacity;
+//      int oldCapacity = capacity;
       capacity *= 2;
-      System.out.println("resizing " + oldCapacity + " -> " + capacity + "...");
+//      System.out.println("resizing " + oldCapacity + " -> " + capacity + "...");
       sizeMaxLoad = capacity * loadFactor;
 
       int[] oldStorage = storage;
       storage = new int[capacity * 2];
 
-      for (int i = 0; i < oldCapacity; i += 2) {
-        int key = oldStorage[i];
+      for (int bucketIdx = 0; bucketIdx < oldStorage.length; bucketIdx += 2) {
+        int key = oldStorage[bucketIdx];
         if (key != 0) {
-          insert(key, oldStorage[i + 1]);
+          insert(key, oldStorage[bucketIdx + 1]);
         }
       }
     }
