@@ -42,4 +42,16 @@ public class IntHashtableTests {
       assertEquals(k * 7, h.get(k));
     }
   }
+
+  @Test
+  void test2() {
+    IntHashtable h = new IntHashtable(10, .75f);
+    h.put(9, 9);
+    h.put(19, 19);
+    h.put(29, 29);
+    assertEquals(3, h.size());
+    assertEquals(9, h.get(9));
+    assertEquals(19, h.get(19));
+    assertEquals(29, h.get(29));
+  }
 }

@@ -38,22 +38,20 @@ public class IntHashtable {
 
     int prevVal = 0;
 
-    out:
-    {
-      for (int bucketIdx = bucket * 2; bucketIdx < storage.length; bucketIdx += 2) {
-        int existingKey = storage[bucketIdx];
-        if (existingKey == 0) { // absent
-          storage[bucketIdx] = key;
-          storage[bucketIdx + 1] = value;
-          break out;
-        } else if (existingKey == key) {
-          prevVal = storage[bucketIdx + 1];
-          storage[bucketIdx + 1] = value; // overwrite
-          break out;
-        }
+    for (int bucketIdx = bucket * 2, i = 0; /*i<capacity*/ ; i++, bucketIdx += 2) {
+      if (bucketIdx >= storage.length) {
+        bucketIdx = 0;
       }
-
-      throw new RuntimeException("todo handle this case");
+      int existingKey = storage[bucketIdx];
+      if (existingKey == 0) { // absent
+        storage[bucketIdx] = key;
+        storage[bucketIdx + 1] = value;
+        break;
+      } else if (existingKey == key) {
+        prevVal = storage[bucketIdx + 1];
+        storage[bucketIdx + 1] = value; // overwrite
+        break;
+      }
     }
     return prevVal;
   }
@@ -65,7 +63,10 @@ public class IntHashtable {
     // we utilize the fact that for int : hash = value
     int bucket = key % capacity;
 
-    for (int bucketIdx = bucket * 2; bucketIdx < storage.length; bucketIdx += 2) {
+    for (int bucketIdx = bucket * 2, i = 0; /*i<capacity*/ ; i++, bucketIdx += 2) {
+      if (bucketIdx >= storage.length) {
+        bucketIdx = 0;
+      }
       int existingKey = storage[bucketIdx];
       if (existingKey == 0) { // absent
         return 0; // absent
@@ -76,14 +77,14 @@ public class IntHashtable {
       }
     }
 
-    return 0; // not found
+//    return 0; // not found
   }
 
   private void resizeIfNeeded() {
     if (size > sizeMaxLoad) {
-//      int oldCapacity = capacity;
+      //      int oldCapacity = capacity;
       capacity *= 2;
-//      System.out.println("resizing " + oldCapacity + " -> " + capacity + "...");
+      //      System.out.println("resizing " + oldCapacity + " -> " + capacity + "...");
       sizeMaxLoad = capacity * loadFactor;
 
       int[] oldStorage = storage;
@@ -102,7 +103,10 @@ public class IntHashtable {
     int bucket = key % capacity;
     // we utilize the fact that for int : hash = value
 
-    for (int bucketIdx = bucket * 2; bucketIdx < storage.length; bucketIdx += 2) {
+    for (int bucketIdx = bucket * 2, i = 0; /*i<capacity*/ ; i++, bucketIdx += 2) {
+      if (bucketIdx >= storage.length) {
+        bucketIdx = 0;
+      }
       int existingKey = storage[bucketIdx];
       if (existingKey == 0) { // absent
         return 0; // not found
@@ -111,7 +115,7 @@ public class IntHashtable {
       }
     }
 
-    return 0; // absent
+//    return 0; // absent
   }
 
   void clear() {
