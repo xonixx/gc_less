@@ -19,20 +19,22 @@ public class IntHashtable {
    * @return prev value for key
    */
   public int put(int key, int value) {
-    int existingVal = insert(key, value);
+    int prevVal = insert(key, value);
 
-    size++;
+    if (prevVal == 0) {
+      size++;
+    }
 
     resizeIfNeeded();
 
-    return existingVal;
+    return prevVal;
   }
 
   private int insert(int key, int value) {
     // we utilize the fact that for int : hash = value
     int bucket = key % capacity;
 
-    int existingVal = 0;
+    int prevVal = 0;
 
     out:
     {
@@ -43,7 +45,7 @@ public class IntHashtable {
           storage[bucketIdx + 1] = value;
           break out;
         } else if (existingKey == key) {
-          existingVal = storage[bucketIdx + 1];
+          prevVal = storage[bucketIdx + 1];
           storage[bucketIdx + 1] = value; // overwrite
           break out;
         }
@@ -51,7 +53,7 @@ public class IntHashtable {
 
       throw new RuntimeException("todo handle this case");
     }
-    return existingVal;
+    return prevVal;
   }
 
   /**
