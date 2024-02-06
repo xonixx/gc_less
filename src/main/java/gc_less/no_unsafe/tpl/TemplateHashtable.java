@@ -151,11 +151,12 @@ public class TemplateHashtable {
     } else {
       boolean found = false;
       for (long node = bucketNode; node != 0; node = Node.getNext(node)) {
-        @Type long nodeKey = Node.getKey(node);
+        MemorySegment nodeMs = Node.of(node);
+        @Type long nodeKey = Node.getKey(nodeMs);
         if (nodeKey == key) {
           // replace node
-          Node.setHash(node, hashCode);
-          Node.setValue(node, value);
+          Node.setHash(nodeMs, hashCode);
+          Node.setValue(nodeMs, value);
           found = true;
           break;
         }
@@ -193,7 +194,8 @@ public class TemplateHashtable {
       long bucketNode = address.get(ValueLayout.JAVA_LONG, bucketOffset);
 
       for (long node = bucketNode; 0 != node; node = Node.getNext(node)) {
-        TemplateHashtable.put(newAddress, Node.getKey(node), Node.getValue(node));
+        MemorySegment nodeMs = Node.of(node);
+        TemplateHashtable.put(newAddress, Node.getKey(nodeMs), Node.getValue(nodeMs));
       }
     }
 
@@ -212,9 +214,10 @@ public class TemplateHashtable {
     long bucketNode = address.get(ValueLayout.JAVA_LONG, bucketOffset);
 
     for (long node = bucketNode; node != 0; node = Node.getNext(node)) {
-      @Type long nodeKey = Node.getKey(node);
+      MemorySegment nodeMs = Node.of(node);
+      @Type long nodeKey = Node.getKey(nodeMs);
       if (nodeKey == key) {
-        return Node.getValue(node);
+        return Node.getValue(nodeMs);
       }
     }
     return 0; // TODO how we distinguish 0 from absent???
@@ -231,7 +234,8 @@ public class TemplateHashtable {
     long bucketNode = address.get(ValueLayout.JAVA_LONG, bucketOffset);
 
     for (long node = bucketNode; node != 0; node = Node.getNext(node)) {
-      @Type long nodeKey = Node.getKey(node);
+      MemorySegment nodeMs = Node.of(node);
+      @Type long nodeKey = Node.getKey(nodeMs);
       if (nodeKey == key) {
         return true;
       }
@@ -259,12 +263,12 @@ public class TemplateHashtable {
         // remove node
         @Type long value = Node.getValue(nodeP);
         if (prevNode != 0) {
-          Node.setNext(prevNode, Node.getNext(node));
+          Node.setNext(Node.of(prevNode), Node.getNext(node));
         } else {
           // this was first node
           address.set(ValueLayout.JAVA_LONG, bucketOffset, 0);
         }
-        Node.free();
+        Node.free(nodeP);
         changeSize(address, -1);
         return value;
       }
@@ -284,7 +288,7 @@ public class TemplateHashtable {
 
       for (long node = bucketNode; 0 != node; ) {
         long next = Node.getNext(node);
-        Node.free(node);
+        Node.free(Node.of(node));
         node = next;
       }
     }
@@ -302,7 +306,7 @@ public class TemplateHashtable {
       int i = 0;
       for (long node = bucketNode; 0 != node; ) {
         long next = Node.getNext(node);
-        TemplateArray.set(keysArrayAddr, i++, Node.getValue(node));
+        TemplateArray.set(keysArrayAddr, i++, Node.getValue(Node.of(node)));
         node = next;
       }
     }
