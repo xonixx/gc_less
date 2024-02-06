@@ -106,6 +106,6 @@ public class IntHashtableSpeedTest {
     for (int i = 0; i < N; i++) {
       tot += map.get(i);
     }
-    System.out.println("tot=" + tot);
+    System.out.println("totP=" + tot);
   }
 }
