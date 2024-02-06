@@ -115,7 +115,7 @@ public class TemplateHashtable {
   }
 
   public static MemorySegment allocate(
-      Allocator allocator /* TODO */, int initialCapacity, float loadFactor) {
+      Arena arena, int initialCapacity, float loadFactor) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long bytes = bucketsOffset + initialCapacity * LONG_SIZE;
     MemorySegment addr = NativeMem.malloc(bytes);
@@ -123,7 +123,11 @@ public class TemplateHashtable {
     setSize(addr, 0);
     setLoadFactor(addr, loadFactor);
     setCapacity(addr, initialCapacity);
-    setRef(addr, Ref.create(addr,1));
+    if (arena != null) {
+      MemorySegment ref = Ref.create(addr, 1);
+      setRef(addr, ref);
+//      allocator.registerForCleanup(ref); TODO
+    }
     return addr;
   }
 
@@ -185,7 +189,9 @@ public class TemplateHashtable {
 
     int newCapacity = capacity * 2;
     MemorySegment newAddress = TemplateHashtable.allocate(null, newCapacity, loadFactor);
-    Ref.set(getRef(newAddress), newAddress);
+    MemorySegment ref = getRef(address);
+    setRef(newAddress, ref);
+    Ref.set(ref, newAddress);
 
     for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {
       //    long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
