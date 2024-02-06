@@ -12,6 +12,11 @@
 @goal test
   mvn test
 
+@goal test1
+  mvn test -Dtest='gc_less.no_unsafe.tpl.TemplateArrayTests'
+@goal test2
+  mvn test -Dtest='gc_less.no_unsafe.tpl.TemplateHashtableTests'
+
 @goal java_version
   $JAVA -version
 

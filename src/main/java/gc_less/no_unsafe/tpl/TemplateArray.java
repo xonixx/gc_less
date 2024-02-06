@@ -1,6 +1,6 @@
 package gc_less.no_unsafe.tpl;
 
-import static gc_less.TypeSizes.LONG_SIZE;
+import static gc_less.TypeSizes.INT_SIZE;
 
 import gc_less.no_unsafe.NativeMem;
 import gc_less.tpl.Type;
@@ -11,8 +11,7 @@ import java.lang.foreign.ValueLayout;
 /** Non-resizable array (similar to arrays in Java) */
 public class TemplateArray {
   private static final long lengthOffset = 0;
-  //  private static final long dataOffset = lengthOffset + INT_SIZE;
-  private static final long dataOffset = lengthOffset + LONG_SIZE; // because of alignment TODO check _UNALIGNED
+  private static final long dataOffset = lengthOffset + INT_SIZE;
 
   public static MemorySegment allocate(int length) {
     return allocate(null, length);
@@ -44,11 +43,11 @@ public class TemplateArray {
   }
 
   public static int getLength(MemorySegment address) {
-    return address.get(ValueLayout.JAVA_INT, 0);
+    return address.get(ValueLayout.JAVA_INT_UNALIGNED, 0);
   }
 
   private static void setLength(MemorySegment address, int length) {
-    address.set(ValueLayout.JAVA_INT, 0, length);
+    address.set(ValueLayout.JAVA_INT_UNALIGNED, 0, length);
   }
 
   public static void free(MemorySegment address) {

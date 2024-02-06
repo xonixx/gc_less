@@ -11,11 +11,11 @@ public final class Tpl {
   }
 
   public static void put(MemorySegment address, long offset, long value) {
-    address.set(ValueLayout.JAVA_LONG, offset, value);
+    address.set(ValueLayout.JAVA_LONG_UNALIGNED, offset, value);
   }
 
   public static long get(MemorySegment address, long offset) {
-    return address.get(ValueLayout.JAVA_LONG, offset);
+    return address.get(ValueLayout.JAVA_LONG_UNALIGNED, offset);
   }
 
   public static int hashCode(long value) {

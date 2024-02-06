@@ -35,7 +35,7 @@ public class TemplateHashtable {
       //    long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketOffset = bucketsOffset + bucketIdx * LONG_SIZE;
       //    long bucketNode = getUnsafe().getLong(bucketAddr);
-      long bucketNode = address.get(ValueLayout.JAVA_LONG, bucketOffset);
+      long bucketNode = address.get(ValueLayout.JAVA_LONG_UNALIGNED, bucketOffset);
 
       if (bucketNode != 0) {
         sb.append("  ").append(bucketIdx).append("->");
@@ -70,7 +70,7 @@ public class TemplateHashtable {
     }
 
     static int getHash(MemorySegment address) {
-      return address.get(ValueLayout.JAVA_INT, hashOffset);
+      return address.get(ValueLayout.JAVA_INT_UNALIGNED, hashOffset);
     }
 
     static @Type long getKey(MemorySegment address) {
@@ -82,11 +82,11 @@ public class TemplateHashtable {
     }
 
     //    static MemorySegment getNext(MemorySegment address) {
-    //      return MemorySegment.ofAddress(address.get(ValueLayout.JAVA_LONG,
+    //      return MemorySegment.ofAddress(address.get(ValueLayout.JAVA_LONG_UNALIGNED,
     // nextOffset)).reinterpret(totalMemToAllocate);
     //    }
     static long getNext(long address) {
-      return of(address).get(ValueLayout.JAVA_LONG, nextOffset);
+      return of(address).get(ValueLayout.JAVA_LONG_UNALIGNED, nextOffset);
     }
 
     static MemorySegment of(long address) {
@@ -94,7 +94,7 @@ public class TemplateHashtable {
     }
 
     static void setHash(MemorySegment address, int hash) {
-      address.set(ValueLayout.JAVA_INT, hashOffset, hash);
+      address.set(ValueLayout.JAVA_INT_UNALIGNED, hashOffset, hash);
     }
 
     static void setKey(MemorySegment address, @Type long key) {
@@ -106,7 +106,7 @@ public class TemplateHashtable {
     }
 
     static void setNext(MemorySegment address, long nextNodeAddress) {
-      address.set(ValueLayout.JAVA_LONG, nextOffset, nextNodeAddress);
+      address.set(ValueLayout.JAVA_LONG_UNALIGNED, nextOffset, nextNodeAddress);
     }
 
     public static String toString(MemorySegment address) {
@@ -141,7 +141,7 @@ public class TemplateHashtable {
     //    long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
     long bucketOffset = bucketsOffset + bucketIdx * LONG_SIZE;
     //    long bucketNode = getUnsafe().getLong(bucketAddr);
-    long bucketNode = address.get(ValueLayout.JAVA_LONG, bucketOffset);
+    long bucketNode = address.get(ValueLayout.JAVA_LONG_UNALIGNED, bucketOffset);
 
     if (bucketNode == 0) { // empty bucket
       MemorySegment node = Node.allocate();
@@ -197,7 +197,7 @@ public class TemplateHashtable {
       //    long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketOffset = bucketsOffset + bucketIdx * LONG_SIZE;
       //    long bucketNode = getUnsafe().getLong(bucketAddr);
-      long bucketNode = address.get(ValueLayout.JAVA_LONG, bucketOffset);
+      long bucketNode = address.get(ValueLayout.JAVA_LONG_UNALIGNED, bucketOffset);
 
       for (long node = bucketNode; 0 != node; node = Node.getNext(node)) {
         MemorySegment nodeMs = Node.of(node);
@@ -217,7 +217,7 @@ public class TemplateHashtable {
     //    long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
     long bucketOffset = bucketsOffset + bucketIdx * LONG_SIZE;
     //    long bucketNode = getUnsafe().getLong(bucketAddr);
-    long bucketNode = address.get(ValueLayout.JAVA_LONG, bucketOffset);
+    long bucketNode = address.get(ValueLayout.JAVA_LONG_UNALIGNED, bucketOffset);
 
     for (long node = bucketNode; node != 0; node = Node.getNext(node)) {
       MemorySegment nodeMs = Node.of(node);
@@ -237,7 +237,7 @@ public class TemplateHashtable {
     //    long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
     long bucketOffset = bucketsOffset + bucketIdx * LONG_SIZE;
     //    long bucketNode = getUnsafe().getLong(bucketAddr);
-    long bucketNode = address.get(ValueLayout.JAVA_LONG, bucketOffset);
+    long bucketNode = address.get(ValueLayout.JAVA_LONG_UNALIGNED, bucketOffset);
 
     for (long node = bucketNode; node != 0; node = Node.getNext(node)) {
       MemorySegment nodeMs = Node.of(node);
@@ -260,7 +260,7 @@ public class TemplateHashtable {
     //    long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
     long bucketOffset = bucketsOffset + bucketIdx * LONG_SIZE;
     //    long bucketNode = getUnsafe().getLong(bucketAddr);
-    long bucketNode = address.get(ValueLayout.JAVA_LONG, bucketOffset);
+    long bucketNode = address.get(ValueLayout.JAVA_LONG_UNALIGNED, bucketOffset);
 
     for (long prevNode = 0, node = bucketNode; node != 0; node = Node.getNext(node)) {
       MemorySegment nodeP = Node.of(node);
@@ -272,7 +272,7 @@ public class TemplateHashtable {
           Node.setNext(Node.of(prevNode), Node.getNext(node));
         } else {
           // this was first node
-          address.set(ValueLayout.JAVA_LONG, bucketOffset, 0);
+          address.set(ValueLayout.JAVA_LONG_UNALIGNED, bucketOffset, 0);
         }
         Node.free(nodeP);
         changeSize(address, -1);
@@ -290,7 +290,7 @@ public class TemplateHashtable {
       //    long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketOffset = bucketsOffset + bucketIdx * LONG_SIZE;
       //    long bucketNode = getUnsafe().getLong(bucketAddr);
-      long bucketNode = address.get(ValueLayout.JAVA_LONG, bucketOffset);
+      long bucketNode = address.get(ValueLayout.JAVA_LONG_UNALIGNED, bucketOffset);
 
       for (long node = bucketNode; 0 != node; ) {
         long next = Node.getNext(node);
@@ -307,7 +307,7 @@ public class TemplateHashtable {
       //    long bucketAddr = address + bucketsOffset + bucketIdx * LONG_SIZE;
       long bucketOffset = bucketsOffset + bucketIdx * LONG_SIZE;
       //    long bucketNode = getUnsafe().getLong(bucketAddr);
-      long bucketNode = address.get(ValueLayout.JAVA_LONG, bucketOffset);
+      long bucketNode = address.get(ValueLayout.JAVA_LONG_UNALIGNED, bucketOffset);
 
       int i = 0;
       for (long node = bucketNode; 0 != node; ) {
@@ -324,11 +324,11 @@ public class TemplateHashtable {
   }
 
   public static int getSize(MemorySegment address) {
-    return address.get(ValueLayout.JAVA_INT, 0);
+    return address.get(ValueLayout.JAVA_INT_UNALIGNED, 0);
   }
 
   private static void setSize(MemorySegment address, int size) {
-    address.set(ValueLayout.JAVA_INT, 0, size);
+    address.set(ValueLayout.JAVA_INT_UNALIGNED, 0, size);
   }
 
   private static void changeSize(MemorySegment address, int delta) {
@@ -336,19 +336,19 @@ public class TemplateHashtable {
   }
 
   public static float getLoadFactor(MemorySegment address) {
-    return address.get(ValueLayout.JAVA_FLOAT, loadFactorOffset);
+    return address.get(ValueLayout.JAVA_FLOAT_UNALIGNED, loadFactorOffset);
   }
 
   private static void setLoadFactor(MemorySegment address, float loadFactor) {
-    address.set(ValueLayout.JAVA_FLOAT, loadFactorOffset, loadFactor);
+    address.set(ValueLayout.JAVA_FLOAT_UNALIGNED, loadFactorOffset, loadFactor);
   }
 
   public static int getCapacity(MemorySegment address) {
-    return address.get(ValueLayout.JAVA_INT, capOffset);
+    return address.get(ValueLayout.JAVA_INT_UNALIGNED, capOffset);
   }
 
   private static void setCapacity(MemorySegment address, int capacity) {
-    address.set(ValueLayout.JAVA_INT, capOffset, capacity);
+    address.set(ValueLayout.JAVA_INT_UNALIGNED, capOffset, capacity);
   }
 
   public static MemorySegment getRef(MemorySegment address) {
