@@ -2,6 +2,10 @@ package gc_less;
 
 import static gc_less.Unsafer.getUnsafe;
 
+/**
+ * Ref is needed when we want to register some object for cleanup. But we can't simply register its
+ * address, because the object can be relocated due to memory reallocation due to growing.
+ */
 public class Ref {
   private static final long targetOffset = 0;
   private static final long typeIdOffset = targetOffset + TypeSizes.LONG_SIZE;
