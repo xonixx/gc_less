@@ -1,12 +1,16 @@
 BEGIN {
-  TPL_FOLDER = "src/main/java/gc_less/tpl"
-  OUT_FOLDER = "src/main/java/gc_less"
   GEN["int"] = "Integer"
   GEN["long"]
   GEN["double"]
   delete Classes
+  TPL_FOLDER = "src/main/java/gc_less/tpl"
+  OUT_FOLDER = "src/main/java/gc_less"
   gen()
   genTypeMeta()
+  TPL_FOLDER = "src/main/java/gc_less/no_unsafe/tpl"
+  OUT_FOLDER = "src/main/java/gc_less/no_unsafe"
+  NO_UNSAFE = 1
+  gen()
 }
 function genTypeMeta(   i,outFile,cls) {
   outFile = OUT_FOLDER "/TypeMeta.java"
@@ -50,8 +54,10 @@ function processTemplate(tplFolder, tplFileName,   tplFile,type,outFile,line,lcf
     typeSizesDone = 0
     while (getline line < tplFile) {
       gsub(/Template/, lcfType, line)
-      if (line ~ /^package/)
+      if (line ~ /^package gc_less.tpl/)
         line = "package gc_less;"
+      if (line ~ /^package gc_less.no_unsafe.tpl/)
+        line = "package gc_less.no_unsafe;"
       else if (line ~ /import static gc_less\.TypeSizes\./)
         if (!typeSizesDone++)
           line = "import static gc_less.TypeSizes.*;"
@@ -67,8 +73,13 @@ function processTemplate(tplFolder, tplFileName,   tplFile,type,outFile,line,lcf
           exit 1
         }
         gsub(/Tpl\.typeSize\(\)/, toupper(type) "_SIZE", line)
-        gsub(/Tpl\.put\(/, "getUnsafe().put" lcfType "(", line)
-        gsub(/Tpl\.get\(/, "getUnsafe().get" lcfType "(", line)
+        if (NO_UNSAFE) {
+          gsub(/Tpl\.put\(address/, "address.set(ValueLayout.JAVA_" toupper(type) "_UNALIGNED", line)
+          gsub(/Tpl\.get\(address/, "address.get(ValueLayout.JAVA_" toupper(type) "_UNALIGNED", line)
+        } else {
+          gsub(/Tpl\.put\(/, "getUnsafe().put" lcfType "(", line)
+          gsub(/Tpl\.get\(/, "getUnsafe().get" lcfType "(", line)
+        }
         gsub(/Tpl\.hashCode\(/, (GEN[type] ? GEN[type] : lcfType) ".hashCode(", line)
       }
       print line >> outFile
