@@ -1,5 +1,6 @@
 package gc_less;
 
+import java.lang.foreign.MemorySegment;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,14 +20,18 @@ public class IntHashtableSpeedTest {
     long t1 = System.currentTimeMillis();
     testGcLessHashMap();
     long t2 = System.currentTimeMillis();
+    testGcLessNoUnsafeHashMap();
+    long t3 = System.currentTimeMillis();
 
-    System.out.println("Java  : " + (t1 - t0));
-    System.out.println("GcLess: " + (t2 - t1));
+    System.out.println("Java    : " + (t1 - t0));
+    System.out.println("GcLess  : " + (t2 - t1));
+    System.out.println("NoUnsafe: " + (t3 - t2));
   }
 
   private static void warmUp() {
     testJavaHashMap();
     testGcLessHashMap();
+    testGcLessNoUnsafeHashMap();
   }
 
   private static void testJavaHashMap() {
@@ -44,7 +49,7 @@ public class IntHashtableSpeedTest {
     for (int i = 0; i < N; i++) {
       tot += javaMap.getOrDefault(i, 0);
     }
-    System.out.println("tot=" + tot);
+    System.out.println("totJ=" + tot);
   }
 
   private static void testGcLessHashMap() {
@@ -62,6 +67,23 @@ public class IntHashtableSpeedTest {
     for (int i = 0; i < N; i++) {
       tot += IntHashtable.get(gcLessMap, i);
     }
-    System.out.println("tot=" + tot);
+    System.out.println("totG=" + tot);
+  }
+  private static void testGcLessNoUnsafeHashMap() {
+    MemorySegment gcLessMap = gc_less.no_unsafe.IntHashtable.allocate(null, INITIAL_CAP, .75f); // like in HashMap
+    for (int i = 0; i < N; i++) {
+      gcLessMap = gc_less.no_unsafe.IntHashtable.put(gcLessMap, i, i);
+    }
+    int tot = 0;
+    for (int i = 0; i < N; i++) {
+      tot += gc_less.no_unsafe.IntHashtable.get(gcLessMap, i);
+    }
+    for (int i = 0; i < N; i++) {
+      tot += gc_less.no_unsafe.IntHashtable.remove(gcLessMap, i);
+    }
+    for (int i = 0; i < N; i++) {
+      tot += gc_less.no_unsafe.IntHashtable.get(gcLessMap, i);
+    }
+    System.out.println("totN=" + tot);
   }
 }

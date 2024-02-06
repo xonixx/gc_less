@@ -35,6 +35,11 @@
     -Xms5m -Xmx5m \
     -cp target/classes gc_less.Main4
 
+@goal speedtest
+@doc 'IntHashtable speed test'
+@depends_on compiled
+  $JAVA -cp target/classes gc_less.IntHashtableSpeedTest
+
 @goal new1
   mvn compile exec:java -Dexec.mainClass="gc_less.no_unsafe.Main1"
 
