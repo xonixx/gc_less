@@ -3,8 +3,8 @@ package gc_less.no_unsafe.tpl;
 import static gc_less.TypeSizes.*;
 
 import gc_less.Allocator;
-import gc_less.Ref;
 import gc_less.no_unsafe.NativeMem;
+import gc_less.no_unsafe.Ref;
 import gc_less.tpl.Type;
 
 import java.lang.foreign.Arena;
@@ -123,7 +123,7 @@ public class TemplateHashtable {
     setSize(addr, 0);
     setLoadFactor(addr, loadFactor);
     setCapacity(addr, initialCapacity);
-    setRef(addr, Ref.create(addr));
+    setRef(addr, Ref.create(addr,1));
     return addr;
   }
 
@@ -345,16 +345,16 @@ public class TemplateHashtable {
     address.set(ValueLayout.JAVA_INT, capOffset, capacity);
   }
 
-  public static long getRef(MemorySegment address) {
-    return getUnsafe().getLong(address + refOffset);
+  public static MemorySegment getRef(MemorySegment address) {
+    return address.get(ValueLayout.ADDRESS_UNALIGNED,refOffset).reinterpret(Ref.totalBytes);
   }
 
-  private static void setRef(MemorySegment address, long ref) {
-    getUnsafe().putLong(address + refOffset, ref);
+  private static void setRef(MemorySegment address, MemorySegment ref) {
+    address.set(ValueLayout.ADDRESS_UNALIGNED,refOffset,ref);
   }
 
   public static void free(MemorySegment address) {
-    clear(address); // TODO is this enough?
+    clear(address);
     NativeMem.free(address);
   }
 }
