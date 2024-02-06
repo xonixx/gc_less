@@ -22,16 +22,20 @@ public class IntHashtableSpeedTest {
     long t2 = System.currentTimeMillis();
     testGcLessNoUnsafeHashMap();
     long t3 = System.currentTimeMillis();
+    testPythonLikeHashMap();
+    long t4 = System.currentTimeMillis();
 
     System.out.println("Java    : " + (t1 - t0));
     System.out.println("GcLess  : " + (t2 - t1));
     System.out.println("NoUnsafe: " + (t3 - t2));
+    System.out.println("Python  : " + (t4 - t3));
   }
 
   private static void warmUp() {
     testJavaHashMap();
     testGcLessHashMap();
     testGcLessNoUnsafeHashMap();
+    testPythonLikeHashMap();
   }
 
   private static void testJavaHashMap() {
@@ -85,5 +89,23 @@ public class IntHashtableSpeedTest {
       tot += gc_less.no_unsafe.IntHashtable.get(gcLessMap, i);
     }
     System.out.println("totN=" + tot);
+  }
+
+  private static void testPythonLikeHashMap() {
+    gc_less.python_like.IntHashtable map = new gc_less.python_like.IntHashtable(INITIAL_CAP, .75f);
+    for (int i = 0; i < N; i++) {
+      map.put(i, i);
+    }
+    int tot = 0;
+    for (int i = 0; i < N; i++) {
+      tot += map.get(i);
+    }
+    for (int i = 0; i < N; i++) {
+      tot += map.remove(i);
+    }
+    for (int i = 0; i < N; i++) {
+      tot += map.get(i);
+    }
+    System.out.println("totP=" + tot);
   }
 }
