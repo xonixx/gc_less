@@ -1,12 +1,13 @@
 package gc_less.python_like;
 
+import static java.lang.foreign.ValueLayout.JAVA_INT;
+
 import gc_less.no_unsafe.NativeMem;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
 
 public class IntHashtableOffHeap {
   private MemorySegment storage;
-  private final long intSize = 4;
+  private final int intSize = 4;
   private int capacity;
   private final float loadFactor;
   private int size;
@@ -16,7 +17,7 @@ public class IntHashtableOffHeap {
     capacity = initialCapacity;
     this.loadFactor = loadFactor;
     sizeMaxLoad = capacity * loadFactor;
-    storage = NativeMem.malloc(capacity * intSize * 2);
+    storage = NativeMem.malloc((long) capacity * intSize * 2);
     storage.fill((byte) 0);
   }
 
@@ -41,18 +42,22 @@ public class IntHashtableOffHeap {
 
     int prevVal = 0;
 
-    for (int bucketIdx = bucket * 2, i = 0; /*i<capacity*/ ; i++, bucketIdx += 2) {
-      if (bucketIdx >= storage.byteSize() / intSize) {
-        bucketIdx = 0;
+    int storageLen = (int) storage.byteSize();
+    int delta = 2 * intSize;
+
+    for (int bucketIdxOffset = bucket * delta, i = 0; /*i<capacity*/ ; i++, bucketIdxOffset += delta) {
+      if (bucketIdxOffset >= storageLen) {
+        bucketIdxOffset = 0;
       }
-      int existingKey = storage.get(ValueLayout.JAVA_INT, bucketIdx * intSize);
+      int existingKey = storage.get(JAVA_INT, bucketIdxOffset);
       if (existingKey == 0) { // absent
-        storage.set(ValueLayout.JAVA_INT, (bucketIdx) * intSize, key);
-        storage.set(ValueLayout.JAVA_INT, (bucketIdx + 1) * intSize, value);
+        storage.set(JAVA_INT, bucketIdxOffset, key);
+        storage.set(JAVA_INT, bucketIdxOffset + intSize, value);
         break;
       } else if (existingKey == key) {
-        prevVal = storage.get(ValueLayout.JAVA_INT, (bucketIdx + 1) * intSize);
-        storage.set(ValueLayout.JAVA_INT, (bucketIdx + 1) * intSize, value); // overwrite
+        long valOffset = bucketIdxOffset + intSize;
+        prevVal = storage.get(JAVA_INT, valOffset);
+        storage.set(JAVA_INT, valOffset, value); // overwrite
         break;
       }
     }
@@ -66,17 +71,20 @@ public class IntHashtableOffHeap {
     // we utilize the fact that for int : hash = value
     int bucket = key % capacity;
 
-    for (int bucketIdx = bucket * 2, i = 0; /*i<capacity*/ ; i++, bucketIdx += 2) {
-      if (bucketIdx >= storage.byteSize() / intSize) {
-        bucketIdx = 0;
+    int storageLen = (int) storage.byteSize();
+    int delta = 2 * intSize;
+
+    for (int bucketIdxOffset = bucket * delta, i = 0; /*i<capacity*/ ; i++, bucketIdxOffset += delta) {
+      if (bucketIdxOffset >= storageLen) {
+        bucketIdxOffset = 0;
       }
-      int existingKey = storage.get(ValueLayout.JAVA_INT, bucketIdx * intSize);
+      int existingKey = storage.get(JAVA_INT, bucketIdxOffset);
       if (existingKey == 0) { // absent
         return 0; // absent
       } else if (existingKey == key) {
         size--;
-        storage.set(ValueLayout.JAVA_INT, (bucketIdx) * intSize, 0); // clear
-        return storage.get(ValueLayout.JAVA_INT, (bucketIdx + 1) * intSize);
+        storage.set(JAVA_INT, bucketIdxOffset, 0); // clear
+        return storage.get(JAVA_INT, bucketIdxOffset + intSize);
       }
     }
 
@@ -92,12 +100,16 @@ public class IntHashtableOffHeap {
 
       MemorySegment oldStorage = storage;
       //      storage = new int[capacity * 2];
-      storage = NativeMem.malloc(capacity * intSize * 2);
+      storage = NativeMem.malloc((long) capacity * intSize * 2);
       storage.fill((byte) 0);
-      for (int bucketIdx = 0; bucketIdx < oldStorage.byteSize() / intSize; bucketIdx += 2) {
-        int key = oldStorage.get(ValueLayout.JAVA_INT, bucketIdx * intSize);
+
+      int storageLen = (int) oldStorage.byteSize();
+      int delta = 2 * intSize;
+
+      for (int bucketIdxOffset = 0; bucketIdxOffset < storageLen; bucketIdxOffset += delta) {
+        int key = oldStorage.get(JAVA_INT, bucketIdxOffset);
         if (key != 0) {
-          insert(key, oldStorage.get(ValueLayout.JAVA_INT, (bucketIdx + 1) * intSize));
+          insert(key, oldStorage.get(JAVA_INT, bucketIdxOffset + intSize));
         }
       }
       NativeMem.free(oldStorage);
@@ -108,15 +120,18 @@ public class IntHashtableOffHeap {
     int bucket = key % capacity;
     // we utilize the fact that for int : hash = value
 
-    for (int bucketIdx = bucket * 2, i = 0; /*i<capacity*/ ; i++, bucketIdx += 2) {
-      if (bucketIdx >= storage.byteSize() / intSize) {
-        bucketIdx = 0;
+    int storageLen = (int) storage.byteSize();
+    int delta = 2 * intSize;
+
+    for (int bucketIdxOffset = bucket * delta, i = 0; /*i<capacity*/ ; i++, bucketIdxOffset += delta) {
+      if (bucketIdxOffset >= storageLen) {
+        bucketIdxOffset = 0;
       }
-      int existingKey = storage.get(ValueLayout.JAVA_INT, bucketIdx * intSize);
+      int existingKey = storage.get(JAVA_INT, bucketIdxOffset);
       if (existingKey == 0) { // absent
         return 0; // not found
       } else if (existingKey == key) {
-        return storage.get(ValueLayout.JAVA_INT, (bucketIdx + 1) * intSize);
+        return storage.get(JAVA_INT, bucketIdxOffset + intSize);
       }
     }
 

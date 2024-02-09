@@ -33,7 +33,6 @@ public class IntHashtableOffHeapTests {
     assertEquals(0, h.get(777));
 
     for (int k = 1; k <= 100; k++) {
-      System.out.println("k="+k);
       assertEquals(0, h.put(k, k * 7));
     }
 
