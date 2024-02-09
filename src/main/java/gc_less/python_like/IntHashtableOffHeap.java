@@ -94,8 +94,7 @@ public class IntHashtableOffHeap {
       //      storage = new int[capacity * 2];
       storage = NativeMem.malloc(capacity * intSize * 2);
       storage.fill((byte) 0);
-
-      for (int bucketIdx = 0; bucketIdx < storage.byteSize() / intSize; bucketIdx += 2) {
+      for (int bucketIdx = 0; bucketIdx < oldStorage.byteSize() / intSize; bucketIdx += 2) {
         int key = oldStorage.get(ValueLayout.JAVA_INT, bucketIdx * intSize);
         if (key != 0) {
           insert(key, oldStorage.get(ValueLayout.JAVA_INT, (bucketIdx + 1) * intSize));
