@@ -35,10 +35,16 @@
     -Xms5m -Xmx5m \
     -cp target/classes gc_less.Main4
 
+@goal run @params CLASS
+@depends_on compiled
+  $JAVA -cp target/classes "$CLASS"
+
 @goal speedtest
 @doc 'IntHashtable speed test'
-@depends_on compiled
-  $JAVA -cp target/classes gc_less.IntHashtableSpeedTest
+@depends_on run @args 'gc_less.IntHashtableSpeedTest'
+
+@goal speedtest1
+@depends_on run @args 'gc_less.no_unsafe.AccessSpeedTest'
 
 @goal new1
   mvn compile exec:java -Dexec.mainClass="gc_less.no_unsafe.Main1"
