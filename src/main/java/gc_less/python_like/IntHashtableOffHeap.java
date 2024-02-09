@@ -1,22 +1,22 @@
-package gc_less.no_unsafe.tpl;
+package gc_less.python_like;
 
-import gc_less.tpl.Type;
+import gc_less.no_unsafe.NativeMem;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 
-import java.util.Arrays;
-
-public class TemplatePyHashtable {
-  private int[] storage;
-
+public class IntHashtableOffHeap {
+  private MemorySegment storage;
+  private final long intSize = 4;
   private int capacity;
   private final float loadFactor;
   private int size;
   private float sizeMaxLoad;
 
-  public TemplatePyHashtable(int initialCapacity, float loadFactor) {
+  public IntHashtableOffHeap(int initialCapacity, float loadFactor) {
     capacity = initialCapacity;
     this.loadFactor = loadFactor;
     sizeMaxLoad = capacity * loadFactor;
-    storage = new int[capacity * 2];
+    storage = NativeMem.malloc(capacity * intSize * 2);
   }
 
   /**
@@ -41,17 +41,17 @@ public class TemplatePyHashtable {
     int prevVal = 0;
 
     for (int bucketIdx = bucket * 2, i = 0; /*i<capacity*/ ; i++, bucketIdx += 2) {
-      if (bucketIdx >= storage.length) {
+      if (bucketIdx >= storage.byteSize() / intSize) {
         bucketIdx = 0;
       }
-      int existingKey = storage[bucketIdx];
+      int existingKey = storage.get(ValueLayout.JAVA_INT, bucketIdx * intSize);
       if (existingKey == 0) { // absent
-        storage[bucketIdx] = key;
-        storage[bucketIdx + 1] = value;
+        storage.set(ValueLayout.JAVA_INT, (bucketIdx) * intSize, key);
+        storage.set(ValueLayout.JAVA_INT, (bucketIdx + 1) * intSize, value);
         break;
       } else if (existingKey == key) {
-        prevVal = storage[bucketIdx + 1];
-        storage[bucketIdx + 1] = value; // overwrite
+        prevVal = storage.get(ValueLayout.JAVA_INT, (bucketIdx + 1) * intSize);
+        storage.set(ValueLayout.JAVA_INT, (bucketIdx + 1) * intSize, value); // overwrite
         break;
       }
     }
@@ -66,20 +66,20 @@ public class TemplatePyHashtable {
     int bucket = key % capacity;
 
     for (int bucketIdx = bucket * 2, i = 0; /*i<capacity*/ ; i++, bucketIdx += 2) {
-      if (bucketIdx >= storage.length) {
+      if (bucketIdx >= storage.byteSize() / intSize) {
         bucketIdx = 0;
       }
-      int existingKey = storage[bucketIdx];
+      int existingKey = storage.get(ValueLayout.JAVA_INT, bucketIdx * intSize);
       if (existingKey == 0) { // absent
         return 0; // absent
       } else if (existingKey == key) {
         size--;
-        storage[bucketIdx] = 0; // clear
-        return storage[bucketIdx + 1];
+        storage.set(ValueLayout.JAVA_INT, (bucketIdx) * intSize, 0); // clear
+        return storage.get(ValueLayout.JAVA_INT, (bucketIdx + 1) * intSize);
       }
     }
 
-//    return 0; // not found
+    //    return 0; // not found
   }
 
   private void resizeIfNeeded() {
@@ -89,15 +89,17 @@ public class TemplatePyHashtable {
       //      System.out.println("resizing " + oldCapacity + " -> " + capacity + "...");
       sizeMaxLoad = capacity * loadFactor;
 
-      int[] oldStorage = storage;
-      storage = new int[capacity * 2];
+      MemorySegment oldStorage = storage;
+      //      storage = new int[capacity * 2];
+      storage = NativeMem.malloc(capacity * intSize * 2);
 
-      for (int bucketIdx = 0; bucketIdx < oldStorage.length; bucketIdx += 2) {
-        int key = oldStorage[bucketIdx];
+      for (int bucketIdx = 0; bucketIdx < storage.byteSize() / intSize; bucketIdx += 2) {
+        int key = oldStorage.get(ValueLayout.JAVA_INT, bucketIdx * intSize);
         if (key != 0) {
-          insert(key, oldStorage[bucketIdx + 1]);
+          insert(key, oldStorage.get(ValueLayout.JAVA_INT, (bucketIdx + 1) * intSize));
         }
       }
+      NativeMem.free(oldStorage);
     }
   }
 
@@ -106,23 +108,27 @@ public class TemplatePyHashtable {
     // we utilize the fact that for int : hash = value
 
     for (int bucketIdx = bucket * 2, i = 0; /*i<capacity*/ ; i++, bucketIdx += 2) {
-      if (bucketIdx >= storage.length) {
+      if (bucketIdx >= storage.byteSize() / intSize) {
         bucketIdx = 0;
       }
-      int existingKey = storage[bucketIdx];
+      int existingKey = storage.get(ValueLayout.JAVA_INT, bucketIdx * intSize);
       if (existingKey == 0) { // absent
         return 0; // not found
       } else if (existingKey == key) {
-        return storage[bucketIdx + 1];
+        return storage.get(ValueLayout.JAVA_INT, (bucketIdx + 1) * intSize);
       }
     }
 
-//    return 0; // absent
+    //    return 0; // absent
   }
 
-  void clear() {
+  public void clear() {
     size = 0;
-    Arrays.fill(storage, 0);
+    storage.fill((byte) 0);
+  }
+
+  public void free() {
+    NativeMem.free(storage);
   }
 
   public int size() {

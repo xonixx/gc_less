@@ -24,11 +24,14 @@ public class IntHashtableSpeedTest {
     long t3 = System.currentTimeMillis();
     testPythonLikeHashMap();
     long t4 = System.currentTimeMillis();
+    testPythonLikeHashMapOffHeap();
+    long t5 = System.currentTimeMillis();
 
     System.out.println("Java    : " + (t1 - t0));
     System.out.println("GcLess  : " + (t2 - t1));
     System.out.println("NoUnsafe: " + (t3 - t2));
     System.out.println("Python  : " + (t4 - t3));
+    System.out.println("PythonOH: " + (t5 - t4));
   }
 
   private static void warmUp() {
@@ -36,6 +39,7 @@ public class IntHashtableSpeedTest {
     testGcLessHashMap();
     testGcLessNoUnsafeHashMap();
     testPythonLikeHashMap();
+    testPythonLikeHashMapOffHeap();
   }
 
   private static void testJavaHashMap() {
@@ -73,8 +77,10 @@ public class IntHashtableSpeedTest {
     }
     System.out.println("totG=" + tot);
   }
+
   private static void testGcLessNoUnsafeHashMap() {
-    MemorySegment gcLessMap = gc_less.no_unsafe.IntHashtable.allocate(null, INITIAL_CAP, .75f); // like in HashMap
+    MemorySegment gcLessMap =
+        gc_less.no_unsafe.IntHashtable.allocate(null, INITIAL_CAP, .75f); // like in HashMap
     for (int i = 0; i < N; i++) {
       gcLessMap = gc_less.no_unsafe.IntHashtable.put(gcLessMap, i, i);
     }
@@ -107,5 +113,25 @@ public class IntHashtableSpeedTest {
       tot += map.get(i);
     }
     System.out.println("totP=" + tot);
+  }
+
+  private static void testPythonLikeHashMapOffHeap() {
+    gc_less.python_like.IntHashtableOffHeap map =
+        new gc_less.python_like.IntHashtableOffHeap(INITIAL_CAP, .75f);
+    for (int i = 0; i < N; i++) {
+      map.put(i, i);
+    }
+    int tot = 0;
+    for (int i = 0; i < N; i++) {
+      tot += map.get(i);
+    }
+    for (int i = 0; i < N; i++) {
+      tot += map.remove(i);
+    }
+    for (int i = 0; i < N; i++) {
+      tot += map.get(i);
+    }
+    //    map.free();
+    System.out.println("totX=" + tot);
   }
 }

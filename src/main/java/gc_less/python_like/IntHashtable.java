@@ -118,7 +118,7 @@ public class IntHashtable {
 //    return 0; // absent
   }
 
-  void clear() {
+  public void clear() {
     size = 0;
     Arrays.fill(storage, 0);
   }
