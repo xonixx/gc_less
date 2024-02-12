@@ -63,10 +63,10 @@ public class AccessSpeedTest {
 
     for (int i = 0; i < TIMES; i++) {
       for (int j = 0; j < LEN; j++) {
-        res += mem.get(JAVA_INT, i * 4);
+        res += mem.get(JAVA_INT, j * 4);
       }
       for (int j = LEN; j-- > 0; ) {
-        res += mem.get(JAVA_INT, i * 4);
+        res += mem.get(JAVA_INT, j * 4);
       }
     }
 
@@ -86,10 +86,10 @@ public class AccessSpeedTest {
 
     for (int i = 0; i < TIMES; i++) {
       for (int j = 0; j < LEN; j++) {
-        res += unsafe.getInt(mem + i * 4);
+        res += unsafe.getInt(mem + j * 4);
       }
       for (int j = LEN; j-- > 0; ) {
-        res += unsafe.getInt(mem + i * 4);
+        res += unsafe.getInt(mem + j * 4);
       }
     }
 
@@ -108,10 +108,10 @@ public class AccessSpeedTest {
 
     for (int i = 0; i < TIMES; i++) {
       for (int j = 0; j < LEN; j++) {
-        res += arr[i];
+        res += arr[j];
       }
       for (int j = LEN; j-- > 0; ) {
-        res += arr[i];
+        res += arr[j];
       }
     }
 
