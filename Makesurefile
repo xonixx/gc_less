@@ -32,7 +32,7 @@
   $JAVA \
     -Xlog:gc \
     -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC \
-    -Xms5m -Xmx5m \
+    -Xms2m -Xmx2m \
     -cp target/classes gc_less.Main4
 
 @goal run @params CLASS
