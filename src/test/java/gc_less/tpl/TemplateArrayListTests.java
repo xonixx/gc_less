@@ -1,6 +1,6 @@
 package gc_less.tpl;
 
-import gc_less.Allocator;
+import gc_less.Cleaner;
 import gc_less.MemoryTrackingAssertNoLeaks;
 import org.junit.jupiter.api.Test;
 
@@ -9,9 +9,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
   @Test
   public void testCreate() {
-    try (Allocator allocator = new Allocator()) {
+    try (Cleaner cleaner = new Cleaner()) {
       // WHEN
-      long arrayList = TemplateArrayList.allocate(allocator, 10);
+      long arrayList = TemplateArrayList.allocate(cleaner, 10);
 
       // THEN
       assertEquals(0, TemplateArrayList.getLength(arrayList));
@@ -21,9 +21,9 @@ public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testLegalAccess() {
-    try (Allocator allocator = new Allocator()) {
+    try (Cleaner cleaner = new Cleaner()) {
       // GIVEN
-      long arrayList = TemplateArrayList.allocate(allocator, 10);
+      long arrayList = TemplateArrayList.allocate(cleaner, 10);
 
       // WHEN
       arrayList = insertData(arrayList);
@@ -40,10 +40,10 @@ public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testLegalAccessWithReallocations() {
-    try (Allocator allocator = new Allocator()) {
+    try (Cleaner cleaner = new Cleaner()) {
 
       // GIVEN
-      long arrayList = TemplateArrayList.allocate(allocator, 1);
+      long arrayList = TemplateArrayList.allocate(cleaner, 1);
 
       // WHEN
       arrayList = insertData(arrayList);
@@ -60,9 +60,9 @@ public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testInsert() {
-    try (Allocator allocator = new Allocator()) {
+    try (Cleaner cleaner = new Cleaner()) {
       // GIVEN
-      long arrayList = TemplateArrayList.allocate(allocator, 10);
+      long arrayList = TemplateArrayList.allocate(cleaner, 10);
 
       // WHEN
       arrayList = TemplateArrayList.add(arrayList, 111);
@@ -81,9 +81,9 @@ public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testRemove() {
-    try (Allocator allocator = new Allocator()) {
+    try (Cleaner cleaner = new Cleaner()) {
       // GIVEN
-      long arrayList = TemplateArrayList.allocate(allocator, 10);
+      long arrayList = TemplateArrayList.allocate(cleaner, 10);
       arrayList = insertData(arrayList);
 
       // WHEN
@@ -108,9 +108,9 @@ public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testIllegalAccess() {
-    try (Allocator allocator = new Allocator()) {
+    try (Cleaner cleaner = new Cleaner()) {
       // GIVEN
-      long arrayList = TemplateArrayList.allocate(allocator, 10);
+      long arrayList = TemplateArrayList.allocate(cleaner, 10);
 
       // WHEN
       arrayList = insertData(arrayList);
@@ -135,9 +135,9 @@ public class TemplateArrayListTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testIllegalAccessInsert() {
-    try (Allocator allocator = new Allocator()) {
+    try (Cleaner cleaner = new Cleaner()) {
       // GIVEN
-      long arrayList = TemplateArrayList.allocate(allocator, 10);
+      long arrayList = TemplateArrayList.allocate(cleaner, 10);
 
       // WHEN
       arrayList = insertData(arrayList);

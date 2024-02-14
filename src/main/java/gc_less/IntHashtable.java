@@ -97,7 +97,7 @@ public class IntHashtable {
     }
   }
 
-  public static long allocate(Allocator allocator, int initialCapacity, float loadFactor) {
+  public static long allocate(Cleaner cleaner, int initialCapacity, float loadFactor) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long bytes = bucketsOffset + initialCapacity * LONG_SIZE;
     long addr = Unsafer.allocateMem(bytes);
@@ -105,10 +105,10 @@ public class IntHashtable {
     setSize(addr, 0);
     setLoadFactor(addr, loadFactor);
     setCapacity(addr, initialCapacity);
-    if (allocator != null) {
+    if (cleaner != null) {
       long ref = Ref.create(addr, typeId);
       setRef(addr, ref);
-      allocator.registerForCleanup(ref);
+      cleaner.registerForCleanup(ref);
     }
     return addr;
   }
@@ -263,8 +263,8 @@ public class IntHashtable {
     }
   }
 
-  public static long keys(long address, Allocator allocator) {
-    long keysArrayAddr = IntArray.allocate(allocator, getSize(address));
+  public static long keys(long address, Cleaner cleaner) {
+    long keysArrayAddr = IntArray.allocate(cleaner, getSize(address));
     int capacity = getCapacity(address);
     int i = 0;
     for (int bucketIdx = 0; bucketIdx < capacity; bucketIdx++) {

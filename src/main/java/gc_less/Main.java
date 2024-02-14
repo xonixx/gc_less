@@ -3,9 +3,9 @@ package gc_less;
 public class Main {
   public static void main(String[] args) {
     long stack, stack1;
-    try (Allocator allocator = new Allocator()) {
-      stack = IntStack.allocate(allocator, 2);
-      stack1 = LongStack.allocate(allocator, 10);
+    try (Cleaner cleaner = new Cleaner()) {
+      stack = IntStack.allocate(cleaner, 2);
+      stack1 = LongStack.allocate(cleaner, 10);
 
       stack = IntStack.push(stack, 1);
       stack = IntStack.push(stack, 2);
@@ -32,9 +32,9 @@ public class Main {
 
   public static void main2() {
     long stack, stack1;
-    try (Allocator allocator = new Allocator()) {
-      stack = IntStack.allocate(allocator, 2);
-      stack1 = LongStack.allocate(allocator, 10);
+    try (Cleaner cleaner = new Cleaner()) {
+      stack = IntStack.allocate(cleaner, 2);
+      stack1 = LongStack.allocate(cleaner, 10);
       
       stack = IntStack.push(stack, 1);
       stack = IntStack.push(stack, 2);

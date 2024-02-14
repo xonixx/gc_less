@@ -1,6 +1,6 @@
 package gc_less.tpl;
 
-import gc_less.Allocator;
+import gc_less.Cleaner;
 import gc_less.Ref;
 import gc_less.TypeMeta;
 import gc_less.Unsafer;
@@ -21,7 +21,7 @@ public class TemplateArrayList {
     return allocate(null, initialCapacity);
   }
 
-  public static long allocate(Allocator allocator, int initialCapacity) {
+  public static long allocate(Cleaner cleaner, int initialCapacity) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long bytes = dataOffset + initialCapacity * Tpl.typeSize();
     long addr = Unsafer.allocateMem(bytes);
@@ -29,8 +29,8 @@ public class TemplateArrayList {
     setCapacity(addr, initialCapacity);
     long ref = Ref.create(addr, typeId);
     setRef(addr, ref);
-    if (allocator != null) {
-      allocator.registerForCleanup(ref);
+    if (cleaner != null) {
+      cleaner.registerForCleanup(ref);
     }
     return addr;
   }

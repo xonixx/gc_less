@@ -1,10 +1,10 @@
 package gc_less;
 
-public class Allocator implements AutoCloseable {
+public class Cleaner implements AutoCloseable {
 
   private final long stack;
 
-  public Allocator() {
+  public Cleaner() {
     stack = LongStack.allocate(10);
     long locals = LongStack.allocate(10);
     LongStack.push(stack, locals);

@@ -1,6 +1,6 @@
 package gc_less.tpl;
 
-import gc_less.Allocator;
+import gc_less.Cleaner;
 import gc_less.Ref;
 import gc_less.TypeMeta;
 import gc_less.Unsafer;
@@ -19,13 +19,13 @@ public class TemplateArray {
     return allocate(null, length);
   }
 
-  public static long allocate(Allocator allocator, int length) {
+  public static long allocate(Cleaner cleaner, int length) {
     long bytes = dataOffset + length * Tpl.typeSize();
     long addr = Unsafer.allocateMem(bytes);
     getUnsafe().setMemory(addr, bytes, (byte) 0);
     setLength(addr, length);
-    if (allocator != null) {
-      allocator.registerForCleanup(Ref.create(addr, typeId));
+    if (cleaner != null) {
+      cleaner.registerForCleanup(Ref.create(addr, typeId));
     }
     return addr;
   }

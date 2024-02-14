@@ -1,6 +1,6 @@
 package gc_less.tpl;
 
-import gc_less.Allocator;
+import gc_less.Cleaner;
 import gc_less.MemoryTrackingAssertNoLeaks;
 import org.junit.jupiter.api.Test;
 
@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TemplateArrayTests extends MemoryTrackingAssertNoLeaks {
   @Test
   public void testCreate() {
-    try (Allocator allocator = new Allocator()) {
-      long array = TemplateArray.allocate(allocator, 10);
+    try (Cleaner cleaner = new Cleaner()) {
+      long array = TemplateArray.allocate(cleaner, 10);
       assertEquals(10, TemplateArray.getLength(array));
       assertEquals(0, TemplateArray.get(array, 0));
       assertEquals(0, TemplateArray.get(array, 7));
@@ -20,9 +20,9 @@ public class TemplateArrayTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testLegalAccess() {
-    try (Allocator allocator = new Allocator()) {
+    try (Cleaner cleaner = new Cleaner()) {
       // GIVEN
-      long array = TemplateArray.allocate(allocator, 10);
+      long array = TemplateArray.allocate(cleaner, 10);
 
       // WHEN
       TemplateArray.set(array, 0, 111);
@@ -38,8 +38,8 @@ public class TemplateArrayTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testIllegalAccess() {
-    try (Allocator allocator = new Allocator()) {
-      long array = TemplateArray.allocate(allocator, 10);
+    try (Cleaner cleaner = new Cleaner()) {
+      long array = TemplateArray.allocate(cleaner, 10);
 
       assertThrows(
           IndexOutOfBoundsException.class, () -> Long.hashCode(TemplateArray.get(array, -1)));
@@ -56,10 +56,10 @@ public class TemplateArrayTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void testArraycopy() {
-    try (Allocator allocator = new Allocator()) {
+    try (Cleaner cleaner = new Cleaner()) {
       // GIVEN
-      long array1 = TemplateArray.allocate(allocator, 10);
-      long array2 = TemplateArray.allocate(allocator, 20);
+      long array1 = TemplateArray.allocate(cleaner, 10);
+      long array2 = TemplateArray.allocate(cleaner, 20);
       TemplateArray.set(array1, 0, 111);
       TemplateArray.set(array1, 7, 222);
       TemplateArray.set(array1, 9, 333);

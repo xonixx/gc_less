@@ -16,15 +16,15 @@ public class LongStack {
     return allocate(null, initialCapacity);
   }
 
-  public static long allocate(Allocator allocator, int initialCapacity) {
+  public static long allocate(Cleaner cleaner, int initialCapacity) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long addr = Unsafer.allocateMem(dataOffset + initialCapacity * LONG_SIZE);
     setLength(addr, 0);
     setCapacity(addr, initialCapacity);
     long ref = Ref.create(addr, typeId);
     setRef(addr, ref);
-    if (allocator != null) {
-      allocator.registerForCleanup(ref);
+    if (cleaner != null) {
+      cleaner.registerForCleanup(ref);
     }
     return addr;
   }

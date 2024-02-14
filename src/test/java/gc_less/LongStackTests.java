@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class LongStackTests extends MemoryTrackingAssertNoLeaks {
   @Test
   public void test1() {
-    try (Allocator allocator = new Allocator()) {
-      long stack = LongStack.allocate(allocator, 10);
+    try (Cleaner cleaner = new Cleaner()) {
+      long stack = LongStack.allocate(cleaner, 10);
 
       long ref = LongStack.getRef(stack);
       assertEquals(stack, Ref.get(ref));
@@ -36,8 +36,8 @@ public class LongStackTests extends MemoryTrackingAssertNoLeaks {
 
   @Test
   public void test2() {
-    try (Allocator allocator = new Allocator()) {
-      long stack = LongStack.allocate(allocator, 2);
+    try (Cleaner cleaner = new Cleaner()) {
+      long stack = LongStack.allocate(cleaner, 2);
 
       long ref = LongStack.getRef(stack);
       assertEquals(stack, Ref.get(ref));

@@ -16,7 +16,7 @@ public class IntArrayList {
     return allocate(null, initialCapacity);
   }
 
-  public static long allocate(Allocator allocator, int initialCapacity) {
+  public static long allocate(Cleaner cleaner, int initialCapacity) {
     if (initialCapacity <= 0) throw new IllegalArgumentException("initialCapacity should be > 0");
     long bytes = dataOffset + initialCapacity * INT_SIZE;
     long addr = Unsafer.allocateMem(bytes);
@@ -24,8 +24,8 @@ public class IntArrayList {
     setCapacity(addr, initialCapacity);
     long ref = Ref.create(addr, typeId);
     setRef(addr, ref);
-    if (allocator != null) {
-      allocator.registerForCleanup(ref);
+    if (cleaner != null) {
+      cleaner.registerForCleanup(ref);
     }
     return addr;
   }

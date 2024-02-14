@@ -2,8 +2,8 @@ package gc_less;
 
 public class Main1 {
   public static void main(String[] args) throws Exception {
-    try (Allocator allocator = new Allocator()) {
-      long stack = LongStack.allocate(allocator,2);
+    try (Cleaner cleaner = new Cleaner()) {
+      long stack = LongStack.allocate(cleaner,2);
       stack = LongStack.push(stack, 1);
       stack = LongStack.push(stack, 2);
       stack = LongStack.push(stack, 3);
