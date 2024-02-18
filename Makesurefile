@@ -54,3 +54,6 @@
 
 @goal new3
   mvn compile exec:java -Dexec.mainClass="gc_less.no_unsafe.Main3"
+
+@goal crash
+  mvn compile exec:java -Dexec.mainClass="gc_less.Crash"
