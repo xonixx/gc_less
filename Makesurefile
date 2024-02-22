@@ -35,6 +35,15 @@
     -Xms2m -Xmx2m \
     -cp target/classes gc_less.Main4
 
+@goal vs
+@doc 'Compares mem consumption of Unsafe-based hashtable vs MemorySegment-based'
+@depends_on compiled
+  $JAVA \
+    -Xlog:gc \
+    -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC \
+    -Xms8m -Xmx8m \
+    -cp target/classes gc_less.MainUnsafeVsMemorySegment
+
 @goal run @params CLASS
 @depends_on compiled
   $JAVA -cp target/classes "$CLASS"
