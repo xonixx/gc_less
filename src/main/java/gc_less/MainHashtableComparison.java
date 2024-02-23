@@ -27,7 +27,7 @@ public class MainHashtableComparison {
       }
       intHashtablePy.put(i, i);
     }
-    intHashtablePy.clear();
+    intHashtablePy.free();
 
     System.out.println("MemorySegment-based hashtable");
     try (Arena arena = Arena.ofShared()) {
