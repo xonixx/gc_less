@@ -8,7 +8,7 @@ public class MainHashtableComparison {
   public static final int N = 1000_000;
 
   public static void main(String[] args) {
-    System.out.println("Unsafe-based hashtable");
+    System.out.println("\n===== Unsafe-based hashtable =====");
     try (Cleaner cleaner = new Cleaner()) {
       long hashtableUnsafe = IntHashtable.allocate(cleaner, 100, .75f);
       for (int i = 0; i < N; i++) {
@@ -19,7 +19,7 @@ public class MainHashtableComparison {
       }
     }
 
-    System.out.println("Python-based hashtable");
+    System.out.println("\n===== Python-based hashtable =====");
     IntHashtableOffHeap intHashtablePy = new IntHashtableOffHeap(100, .75f);
     for (int i = 0; i < N; i++) {
       if (i % 1000 == 0) {
@@ -29,7 +29,7 @@ public class MainHashtableComparison {
     }
     intHashtablePy.free();
 
-    System.out.println("MemorySegment-based hashtable");
+    System.out.println("\n===== MemorySegment-based hashtable =====");
     try (Arena arena = Arena.ofShared()) {
       MemorySegment hashtableMS = gc_less.no_unsafe.IntHashtable.allocate(arena, 100, .75f);
       for (int i = 0; i < N; i++) {
