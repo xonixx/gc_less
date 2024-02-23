@@ -42,7 +42,7 @@
     -Xlog:gc \
     -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC \
     -Xms8m -Xmx8m \
-    -cp target/classes gc_less.MainUnsafeVsMemorySegment
+    -cp target/classes gc_less.MainHashtableComparison
 
 @goal run @params CLASS
 @depends_on compiled
