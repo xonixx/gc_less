@@ -44,6 +44,9 @@
     -Xms8m -Xmx8m \
     -cp target/classes gc_less.MainHashtableComparison
 
+# https://stackoverflow.com/questions/28327620/difference-between-java-options-java-tool-options-and-java-opts
+#@define JAVA_TOOL_OPTIONS '-XX:+PrintCompilation'
+
 @goal run @params CLASS
 @depends_on compiled
   $JAVA -cp target/classes "$CLASS"
@@ -53,7 +56,7 @@
 @depends_on run @args 'gc_less.IntHashtableSpeedTest'
 
 @goal access_speedtest
-@depends_on run @args 'gc_less.no_unsafe.AccessSpeedTest'
+@depends_on run @args 'gc_less.AccessSpeedTest'
 
 @goal new1
   mvn compile exec:java -Dexec.mainClass="gc_less.no_unsafe.Main1"
