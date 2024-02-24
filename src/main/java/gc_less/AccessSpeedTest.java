@@ -1,11 +1,10 @@
-package gc_less.no_unsafe;
-
-import gc_less.Unsafer;
-import sun.misc.Unsafe;
+package gc_less;
 
 import static java.lang.foreign.ValueLayout.JAVA_INT;
 
+import gc_less.no_unsafe.NativeMem;
 import java.lang.foreign.MemorySegment;
+import sun.misc.Unsafe;
 
 public class AccessSpeedTest {
 

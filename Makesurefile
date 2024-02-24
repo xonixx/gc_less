@@ -48,11 +48,11 @@
 @depends_on compiled
   $JAVA -cp target/classes "$CLASS"
 
-@goal speedtest
+@goal ht_speedtest
 @doc 'IntHashtable speed test'
 @depends_on run @args 'gc_less.IntHashtableSpeedTest'
 
-@goal speedtest1
+@goal access_speedtest
 @depends_on run @args 'gc_less.no_unsafe.AccessSpeedTest'
 
 @goal new1
