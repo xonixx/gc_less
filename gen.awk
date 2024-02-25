@@ -66,8 +66,8 @@ function processTemplate(tplFolder, tplFileName,   tplFile,type,outFile,line,lcf
       else if (line ~ /import gc_less\./)
         continue
       else {
-        gsub(/\@Type long/, type, line)
-        if (line ~ /\@Type/) {
+        gsub(/@Type long/, type, line)
+        if (line ~ /@Type/) {
           print "Error at file: " tplFile ", line:"
           print line
           exit 1
