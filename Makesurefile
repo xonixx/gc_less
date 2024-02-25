@@ -43,7 +43,7 @@
     --enable-native-access=ALL-UNNAMED \
     -Xlog:gc \
     -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC \
-    -Xms8m -Xmx8m \
+    -Xms20m -Xmx20m \
     -cp target/classes gc_less.MainHashtableComparison
 
 # https://stackoverflow.com/questions/28327620/difference-between-java-options-java-tool-options-and-java-opts
