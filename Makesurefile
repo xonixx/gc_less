@@ -35,7 +35,11 @@
 @depends_on run_epsilon @args 'gc_less.MainHashtableComparison' '20m'
 
 @goal main5
-@depends_on run_epsilon @args 'gc_less.Main5' '50m'
+@depends_on run_epsilon @args 'gc_less.Main5' '20m'
+@goal main6
+@depends_on run_epsilon @args 'gc_less.Main6' '20m'
+@goal main7
+@depends_on run_epsilon @args 'gc_less.Main7' '20m'
 
 # https://stackoverflow.com/questions/28327620/difference-between-java-options-java-tool-options-and-java-opts
 #@define JAVA_TOOL_OPTIONS '-XX:+PrintCompilation'
