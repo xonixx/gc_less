@@ -30,7 +30,7 @@ public class MainHashtableComparison {
     intHashtablePy.free();
 
     System.out.println("\n===== MemorySegment-based hashtable =====");
-    try (Arena arena = Arena.ofShared()) {
+    try (Arena arena = Arena.ofConfined()) {
       MemorySegment hashtableMS = gc_less.no_unsafe.IntHashtable.allocate(arena, 100, .75f);
       for (int i = 0; i < N; i++) {
         if (i % 10000 == 0) {
