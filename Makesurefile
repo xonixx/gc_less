@@ -28,30 +28,31 @@
 
 @goal main4
 @doc 'Runs java with No-op GC (EpsilonGC)'
-@depends_on compiled
-  $JAVA \
-    --enable-native-access=ALL-UNNAMED \
-    -Xlog:gc \
-    -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC \
-    -Xms2m -Xmx2m \
-    -cp target/classes gc_less.Main4
+@depends_on run_epsilon @args 'gc_less.Main4' '2m'
 
 @goal vs
 @doc 'Compares mem consumption of Unsafe-based hashtable vs MemorySegment-based'
-@depends_on compiled
-  $JAVA \
-    --enable-native-access=ALL-UNNAMED \
-    -Xlog:gc \
-    -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC \
-    -Xms20m -Xmx20m \
-    -cp target/classes gc_less.MainHashtableComparison
+@depends_on run_epsilon @args 'gc_less.MainHashtableComparison' '20m'
+
+@goal main5
+@depends_on run_epsilon @args 'gc_less.Main5' '50m'
 
 # https://stackoverflow.com/questions/28327620/difference-between-java-options-java-tool-options-and-java-opts
 #@define JAVA_TOOL_OPTIONS '-XX:+PrintCompilation'
 
-@goal run @params CLASS
+@goal run @params CLASS @private
 @depends_on compiled
   $JAVA --enable-native-access=ALL-UNNAMED -cp target/classes "$CLASS"
+
+@goal run_epsilon @params CLASS HEAP @private
+@depends_on compiled
+  $JAVA \
+    --enable-native-access=ALL-UNNAMED \
+    -Xlog:gc \
+    -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC \
+    -Xms"$HEAP" -Xmx"$HEAP" \
+    -XX:+UnlockDiagnosticVMOptions \
+    -cp target/classes "$CLASS"
 
 @goal ht_speedtest
 @doc 'IntHashtable speed test'
