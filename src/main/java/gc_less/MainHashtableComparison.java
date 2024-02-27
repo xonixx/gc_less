@@ -20,16 +20,6 @@ public class MainHashtableComparison {
       }
     }
 
-    System.out.println("\n===== Python-based hashtable =====");
-    IntHashtableOffHeap intHashtablePy = new IntHashtableOffHeap(100, .75f);
-    for (int i = 0; i < N; i++) {
-      if (i % PRINT_EVERY == 0) {
-        System.out.println("Python-based: " + i);
-      }
-      intHashtablePy.put(i, i);
-    }
-    intHashtablePy.free();
-
     System.out.println("\n===== MemorySegment-based hashtable =====");
     try (Arena arena = Arena.ofConfined()) {
       MemorySegment hashtableMS = gc_less.no_unsafe.IntHashtable.allocate(arena, 100, .75f);
@@ -40,6 +30,16 @@ public class MainHashtableComparison {
         hashtableMS = gc_less.no_unsafe.IntHashtable.put(hashtableMS, i, i);
       }
     }
+
+    System.out.println("\n===== Python-based hashtable =====");
+    IntHashtableOffHeap intHashtablePy = new IntHashtableOffHeap(100, .75f);
+    for (int i = 0; i < N; i++) {
+      if (i % PRINT_EVERY == 0) {
+        System.out.println("Python-based: " + i);
+      }
+      intHashtablePy.put(i, i);
+    }
+    intHashtablePy.free();
 
     /*System.out.println("Done!");
     try {
